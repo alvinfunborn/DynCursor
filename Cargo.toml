@@ -1,0 +1,19 @@
+[package]
+name = "DynCursor"
+version = "0.1.0"
+authors = ["zhouwenxiang <zhouwx@lanxi.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# 基础组件
+log = "0.4"
+log4rs = "1.0"
+log-panics = "2.0"
+z_lib = { path = "z_lib" }
+lazy_static = "1.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+# winapi
+winapi = { version = "0.3", features = ["winuser","errhandlingapi","winbase"] }

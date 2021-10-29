@@ -1,0 +1,9 @@
+# 需要替换光标的输入法编码, 可以配置多个, 使用英文逗号','分隔, 
+# 修改后需要重启
+# 例`0804`是PRC简体中文, `0409`是US英文, 输入法编码参考文档https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-lcid/70feba9f-294e-491e-b6eb-56532684c37f
+custom-layout: 0804
+
+# 光标替换映射, key:value格式, 可以配置多个, 使用英文逗号','分隔; 注意key是默认光标, value是替换光标;
+# 修改后需要重启
+# 例`32512:32651`是替换`正常选择`和`帮助选择`, `32513:32516`是替换`文本选择`和`候选`, `32649:32648`是替换`链接选择`和`不可用`, 光标编码参考文档https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadcursorw
+cursor-mapping: 32512:32651, 32513:32516, 32649:32648

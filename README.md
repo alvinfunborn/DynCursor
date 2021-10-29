@@ -3,7 +3,7 @@
 
 假如在Windows上安装了多门语言频繁切换, 同时隐藏了语言栏, 使用时可能很难感知当前输入法是什么语言, 需要查看任务栏语言图标或者直接打字(薛定谔的输入法)来判断, 影响心态;
 
-此工具能帮助快速判断所用的语言, 通过简单几步配置, 即可在使用英文时看到鼠标白色指针, 使用中文时看到鼠标黑色指针; 也可以自制其他颜色和图标的指针;
+此工具能帮助快速判断所用的语言, 通过简单几步配置, 即可在使用英文时看到鼠标白色指针, 使用中文时看到鼠标黑色指针; 也可以[下载](http://www.rw-designer.com/cursor-library/set-0)或自制其他颜色和图标的指针;
 
 实现思路是一直查询当前使用的语言, 如果当前语言是`中文(简体,中国)`, 则替换鼠标指针的状态
 1. `正常选择`替换为`帮助选择`
@@ -16,28 +16,28 @@
 - 仅支持语言切换(无法监听`shift`切换输入法, 使用`win+space`或`alt+shift`来切换语言);
 
 ## 使用
-1. 下载DynCursor.zip, 解压到任意目录, 无需安装
+1. 下载[DynCursor.zip](https://github.com/alvinfunborn/DynCursor/releases), 解压到任意目录, 无需安装
 1. 按需修改配置文件[config/config.yaml](config/config.yaml)
     > 默认配置是在`中文(简体,中国)`时修改`标准箭头`和`文本选择`和`链接选择`的样式; 其他光标保持不变, 但`帮助选择`和`候选`和`不可用`分别会变成`标准箭头`和`文本选择`和`链接选择`
 1. 建议修改`鼠标属性-指针`自定义里的图标, 会有更好的观感
     1. 修改`帮助选择`样式
         1. 选中`帮助选择`
         ![avatar](resources/before-a.jpg)
-        1. 浏览可用图标, 可以自制cur文件
+        1. 浏览可用图标, 可以[下载](http://www.rw-designer.com/cursor-library/set-0)或自制cur文件
         ![avatar](resources/search-a.jpg)
         1. 确认
         ![avatar](resources/after-a.jpg)
     1. 修改`候选`样式
         1. 选中`候选`
         ![avatar](resources/before-i.jpg)
-        1. 浏览可用图标, 可以自制cur文件
+        1. 浏览可用图标, 可以[下载](http://www.rw-designer.com/cursor-library/set-0)或自制cur文件
         ![avatar](resources/search-i.jpg)
         1. 确认
         ![avatar](resources/after-i.jpg)
     1. 修改`不可用`样式
         1. 选中`不可用`
         ![avatar](resources/before-h.jpg)
-        1. 浏览可用图标, 可以自制cur文件
+        1. 浏览可用图标, 可以[下载](http://www.rw-designer.com/cursor-library/set-0)或自制cur文件
         ![avatar](resources/search-h.jpg)
         1. 确认
         ![avatar](resources/after-h.jpg)

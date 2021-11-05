@@ -1,4 +1,4 @@
-// #![windows_subsystem = "windows"]
+#![windows_subsystem = "windows"]
 #[macro_use]
 extern crate lazy_static;
 extern crate log_panics;

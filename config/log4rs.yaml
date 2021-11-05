@@ -21,4 +21,4 @@ appenders:
 root:
   level: info
   appenders:
-    - stdout
+    - infofile

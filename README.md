@@ -19,14 +19,17 @@
     > 默认配置是在输入法为`中文(简体,中国)`时修改`标准箭头`<image src="resources/figure/aero_arrow.cur" height="20" width="20"></image>和`文本选择`<image src="resources/figure/beam_r.cur" height="20" width="20"></image>和`链接选择`<image src="resources/figure/aero_link.cur" height="20" width="20"></image>的样式; 其他光标保持不变;
 1. 建议修改`鼠标属性-指针`自定义里的图标, 会有更好的观感, 在resources/cur目录里有已下载的一些图标, 也可以在[rw designer](http://www.rw-designer.com/cursor-library/set-0)挑选合适的图标
     1. 修改`帮助选择`样式
+
         ![avatar](resources/figure/before-a.jpg)
         ![avatar](resources/figure/search-a.jpg)
         ![avatar](resources/figure/after-a.jpg)
     1. 修改`候选`样式
+
         ![avatar](resources/figure/before-i.jpg)
         ![avatar](resources/figure/search-i.jpg)
         ![avatar](resources/figure/after-i.jpg)
     1. 修改`不可用`样式
+
         ![avatar](resources/figure/before-h.jpg)
         ![avatar](resources/figure/search-h.jpg)
         ![avatar](resources/figure/after-h.jpg)
@@ -37,6 +40,7 @@
 
 ## 效果图
 - 使用个性化图标
+
 ![avatar](resources/figure/finalcut1.gif)
 
 ## 如何设置开机自启动

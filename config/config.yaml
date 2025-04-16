@@ -7,3 +7,6 @@ custom-layout: 0804
 # 修改后需要重启
 # 例`32512:32651`是替换`正常选择`和`帮助选择`, `32513:32516`是替换`文本选择`和`候选`, `32649:32648`是替换`链接选择`和`不可用`, 光标编码参考文档https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadcursorw
 cursor-mapping: 32512:32651, 32513:32516, 32649:32648
+
+# 是否启用日志记录, true表示启用, false表示禁用
+enable-logging: false

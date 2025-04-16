@@ -6,3 +6,6 @@ target
 *.log
 .history
 .vscode
+.cursor
+.history
+.specstory

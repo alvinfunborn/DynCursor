@@ -63,9 +63,9 @@ fn sync_tray(app: &AppHandle) {
         let status = state.engine.status();
         let paused = status.paused || !status.enabled;
         let _ = state.pause_item.set_text(if paused {
-            "恢复动态切换"
+            "继续切换"
         } else {
-            "暂停并恢复原始光标"
+            "暂停切换（恢复原图案）"
         });
         if let Some(tray) = app.tray_by_id("main") {
             let _ = tray.set_tooltip(Some(if paused {
@@ -229,10 +229,15 @@ async fn perform_action(app: AppHandle, action: String) -> Result<(), String> {
         let state = app.state::<AppState>();
         match action.as_str() {
             "show" => show_window(&app),
+            "notepad" => {
+                std::process::Command::new("notepad.exe")
+                    .spawn()
+                    .map_err(|e| format!("无法打开记事本：{}", e))?;
+            }
             "pause" => {
                 let status = state.engine.status();
                 if !status.enabled {
-                    return Err("自动切换已在设置中关闭，请先启用并保存".into());
+                    return Err("请先在“光标设置”开启“跟随输入法切换”并保存".into());
                 }
                 state.engine.pause(!status.paused)?;
             }
@@ -379,14 +384,19 @@ pub fn run(
         .setup(move |app| {
             let handle = app.handle().clone();
             let settings_item = MenuItem::with_id(&handle, "show", "打开设置", true, None::<&str>)?;
-            let pause_item =
-                MenuItem::with_id(&handle, "pause", "暂停并恢复原始光标", true, None::<&str>)?;
+            let pause_item = MenuItem::with_id(
+                &handle,
+                "pause",
+                "暂停切换（恢复原图案）",
+                true,
+                None::<&str>,
+            )?;
             let mouse_item =
                 MenuItem::with_id(&handle, "mouse", "Windows 指针设置…", true, None::<&str>)?;
             let capture_item = MenuItem::with_id(
                 &handle,
                 "recapture",
-                "重新捕获并恢复运行",
+                "重新读取 Windows 图案并继续",
                 true,
                 None::<&str>,
             )?;

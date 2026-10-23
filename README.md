@@ -1,6 +1,6 @@
 # DynCursor
 
-[项目主页](https://alvinfunborn.github.io/DynCursor/) · [Windows 图文设置指南](https://alvinfunborn.github.io/DynCursor/guide.html) · [下载 v1.1.0](https://github.com/alvinfunborn/DynCursor/releases/latest) · [赞助说明](https://alvinfunborn.github.io/DynCursor/sponsor.html)
+[项目主页](https://alvinfunborn.github.io/DynCursor/) · [Windows 图文设置指南](https://alvinfunborn.github.io/DynCursor/guide.html) · [下载 v1.1.1](https://github.com/alvinfunborn/DynCursor/releases/latest) · [赞助说明](https://alvinfunborn.github.io/DynCursor/sponsor.html)
 1.1.0 提供设置窗口、托盘菜单、登录自启动和直接选择光标文件，默认附带三枚原创光标。下方保留 Windows 来源映射的原理与手动配置说明。
 
 ## Windows系统动态修改鼠标指针光标图标样式, 根据键盘布局/语言/输入法的切换而变化.
@@ -17,18 +17,18 @@
 程序启动时会保存映射中涉及的光标副本。在自定义输入法状态下，目标光标使用替换光标的图案；切回默认状态时，目标光标恢复为启动时的图案。替换光标本身保持原样。因此只需要把`帮助选择`<image src="resources/figure/aero_helpsel.cur" height="20" width="20"></image>的图标修改成其他颜色指针<image src="resources/figure/arrow_r.cur" height="20" width="20"></image>，即可实现动态光标颜色；其他鼠标指针状态同理。
 默认取代`帮助选择`<image src="resources/figure/aero_helpsel.cur" height="20" width="20"></image>,`候选`<image src="resources/figure/up_r.cur" height="20" width="20"></image>,`不可用`<image src="resources/figure/aero_unavail.cur" height="20" width="20"></image>是因为这些指针状态极少出现, 或者可以在[配置文件](config/config.yaml)中修改成其他替换指针;
 
-## 使用（1.1.0 窗口版）
+## 使用（设置窗口）
 
 要求 Windows 10 / 11 x64 和 [Microsoft Edge WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/)。下载 ZIP 后完整解压到可写的固定目录，无需管理员权限。升级前先退出旧版；0.2.1 需要从任务管理器退出。
 
-1. 双击 `DynCursor.exe`，默认打开设置窗口；新版附带三枚原创绿色光标，首次无需修改 Windows 来源指针。
-2. **光标外观**：启用/停用三类光标，直接选择自己的静态 `.cur` 文件并预览（不支持 `.ani`，最大 2 MB），点“保存并应用”。留空文件时才使用 Windows 来源映射；其他高级映射会保留。
-3. **输入与检测**：选择语言编码（默认简体中文 `0804`），调整检测间隔（50–2000 ms）和稳定时间（0–2000 ms）。
-4. **启动与托盘**：登录自启动立即生效；可选择手动启动时隐藏、关闭窗口保留托盘。登录自启动始终后台启动；移动文件夹后请关闭再开启自启。
-5. **概览**：查看输入状态，暂停/恢复，快速打开 Windows 指针设置、光标文件夹。修改 Windows 方案前先暂停，应用后“重新捕获并恢复运行”。
-6. **诊断与帮助**：打开配置/日志目录，重新读取 YAML、恢复光标、查看指南。配置文件固定为 EXE 旁的 `config/config.yaml`，错误会显示在窗口中并暂停启动。
+1. 双击 `DynCursor.exe`，进入 **光标设置**，按三步完成：选语言 → 选图案 → 保存并试一试。微软拼音直接选“简体中文”，不必填写编码。
+2. **直接选图案**：点击“使用内置绿色光标”，或为箭头、文字里的 I 形、链接上的小手分别选 `.cur` 文件（不支持 `.ani`，最大 2 MB）。窗口会并排说明原图案与替换图案。
+3. **按 README 设置 Windows**：已经配置过系统指针的，继续沿用原来的方案；窗口按“打开 Windows 设置 → 修改帮助选择/候选/不可用并应用 → 继续切换”引导，提供逐步截图入口。选择这个说明页本身不会改动配置。
+4. 点击“保存并应用”，再点“打开记事本试一试”，切换中英文验证。勾选框控制三类光标是否参与切换。
+5. **启动与托盘**：设置登录自启、打开程序时不弹窗口、关闭窗口继续运行。登录自启立即生效，其他选项保存后生效。
+6. **更多设置**：检测间隔、稳定时间、映射编码、配置文件、日志和恢复功能折叠收纳，日常使用无需修改。
 
-关闭窗口默认只隐藏，后台继续运行。左键托盘图标打开设置，右键可暂停、打开 Windows 指针设置、重新捕获和退出。再次双击程序会唤出已有窗口。退出使用“恢复光标并退出”或 `--stop`；强制结束进程无法执行自动恢复。
+关闭窗口默认只隐藏，后台继续运行。左键托盘图标打开设置，右键可暂停、打开 Windows 指针设置、重新读取 Windows 图案和退出。再次双击程序会唤出已有窗口。退出使用“恢复光标并退出”或 `--stop`；强制结束进程无法执行自动恢复。
 
 窗口设置以草稿形式编辑，点击“保存并应用”才写入。配置保存失败时保留旧配置；未知 YAML 字段会保留，注释和格式会重新生成。手动修改文件后，可用“重新读取配置”。
 
@@ -36,7 +36,7 @@
 
 如果希望复用 Windows 方案，在窗口清空直接文件，按 [Windows 图文设置指南](https://alvinfunborn.github.io/DynCursor/guide.html) 操作。指南保留下面九张 README 历史截图，补充 Win10/11 入口、当前文件名、暂停/捕获、指针可见性、自启和排错。
 
-先保存原始 Windows 指针方案，再设置“帮助选择→箭头”、“候选→I 形”、“不可用→手形”，点“应用”后重新捕获。历史截图图案与新版原创素材不同，请按当前文件名选择。
+先保存原始 Windows 指针方案，再设置“帮助选择→箭头”、“候选→I 形”、“不可用→手形”，点“应用”后重新读取 Windows 图案。历史截图图案与新版原创素材不同，请按当前文件名选择。
 
 <details><summary>展开九张历史 Windows 设置截图</summary>
 
@@ -52,7 +52,7 @@
 
 </details>
 
-建议在 `鼠标属性 → 指针选项` 取消“在打字时隐藏指针”，可选开启“当按 CTRL 键时显示指针的位置”。窗口里的“Windows 指针设置”能快速到达系统指针选项卡。
+建议在 `鼠标属性 → 指针选项` 取消“在打字时隐藏指针”，可选开启“当按 CTRL 键时显示指针的位置”。窗口里的“打开 Windows「指针」设置”能快速到达系统指针选项卡。
 
 暂停和正常退出恢复本次捕获的目标光标。`--reset-cursors` 或窗口的“重载 Windows 已保存方案”重新加载当前保存方案，并非出厂设置；要彻底还原来源指针，请在 Windows 中选回事先保存的原始方案并应用。
 
@@ -87,7 +87,7 @@ node --test scripts/test-settings.cjs
 
 随后运行 `target/release/DynCursor.exe`。回归测试使用模拟光标，不修改桌面的系统指针。GitHub Actions 会执行检查并生成包含程序、配置及示例光标的便携 ZIP。
 
-当前版本为 `1.1.0`，源码版本、Windows 文件版本与 Git 标签保持一致。更新内容见 [CHANGELOG.md](CHANGELOG.md)。历史 `v0.2.1` 中的 `Cargo.toml` 曾保留 `0.1.0`，属于元数据未同步。
+当前版本为 `1.1.1`，源码版本、Windows 文件版本与 Git 标签保持一致。更新内容见 [CHANGELOG.md](CHANGELOG.md)。历史 `v0.2.1` 中的 `Cargo.toml` 曾保留 `0.1.0`，属于元数据未同步。
 
 ## 支持项目
 

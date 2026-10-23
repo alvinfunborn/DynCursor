@@ -1,79 +1,129 @@
 #![windows_subsystem = "windows"]
-#[macro_use]
-extern crate lazy_static;
-extern crate log_panics;
-extern crate z_lib;
-use log4rs;
-use log::info;
+
+use log::{info, warn};
+use std::path::PathBuf;
 use std::thread::sleep;
 use std::time::Duration;
-mod yaml_client;
-mod ime;
+use windows::{Win32::Foundation::*, Win32::UI::WindowsAndMessaging::*};
+
 mod cursor;
+mod ime;
+mod instance;
+mod yaml_client;
 
-const CUSTOM_LAYOUT: &str = "custom-layout";
-const ENABLE_LOGGING: &str = "enable-logging";
-
-fn listen_keyboard_layout() {
-    let mut former_custom = false;
-    let mut inited = false;
-    let custom_layouts = yaml_client::get_config(CUSTOM_LAYOUT).unwrap();
-    
-    // 初始化时等待系统稳定
+fn listen_keyboard_layout(
+    config: yaml_client::Config,
+    instance: &instance::Instance,
+) -> Result<(), String> {
+    let mut cursors = cursor::CursorManager::new(cursor::WindowsBackend, config.cursor_mapping)
+        .map_err(|error| format!("无法保存原始光标：{}", error))?;
+    let mut applied = Some(false);
     sleep(Duration::from_millis(500));
-    
-    loop {
-        // 主循环间隔
-        sleep(Duration::from_millis(100));
-        
-        // 获取当前状态
-        let (current_custom, locale_code, conversion) = ime::is_custom_ime(custom_layouts.clone());
-        
-        // 如果状态发生变化，等待一段时间让系统稳定
-        if !inited || current_custom != former_custom {
-            sleep(Duration::from_millis(100));
-            let (verify_custom, _, _) = ime::is_custom_ime(custom_layouts.clone());
-            
-            // 如果状态不稳定，跳过本次循环
-            if verify_custom != current_custom {
-                continue;
-            }
-            
-            // 执行光标更改
-            if !inited {
-                if current_custom {
-                    info!("locale:{}, conversion:{}, init as custom ime", locale_code, conversion);
-                    cursor::change_cursor();
-                    former_custom = true;
-                }
-                inited = true;
-            } else if current_custom != former_custom {
-                info!("locale:{}, conversion:{}, change from former:{} to current:{}", 
-                    locale_code, conversion,
-                    if former_custom { "custom ime" } else { "default ime" },
-                    if current_custom { "custom ime" } else { "default ime" }
+    while !instance.stopping(100)? {
+        let state = match ime::current_state(&config.custom_layouts) {
+            Some(state) => state,
+            None => continue,
+        };
+        if applied == Some(state.custom) {
+            continue;
+        }
+        if instance.stopping(100)? {
+            break;
+        }
+        let stable = ime::current_state(&config.custom_layouts)
+            .map(|verified| verified.custom == state.custom && verified.locale == state.locale)
+            .unwrap_or(false);
+        if !stable {
+            continue;
+        }
+        match cursors.set_custom(state.custom) {
+            Ok(()) => {
+                applied = Some(state.custom);
+                info!(
+                    "locale:{:04x}, conversion:{}, custom:{}",
+                    state.locale, state.conversion, state.custom
                 );
-                cursor::change_cursor();
-                former_custom = current_custom;
             }
-            
-            // 状态变化后额外等待一段时间
-            sleep(Duration::from_millis(50));
+            Err(error) => {
+                applied = None;
+                warn!("切换光标失败，将重试：{}", error);
+                if instance.stopping(500)? {
+                    break;
+                }
+            }
         }
     }
+    cursors
+        .restore()
+        .map_err(|error| format!("恢复原始光标失败：{}", error))
 }
 
-pub fn init() {
-    if let Some(enable_logging) = yaml_client::get_config(ENABLE_LOGGING) {
-        if enable_logging == "true" {
-            log4rs::init_file("config/log4rs.yaml", Default::default()).unwrap();
-            log_panics::init();
-            info!("log inited...");
+fn run(arguments: &[std::ffi::OsString]) -> Result<(), String> {
+    let executable = std::env::current_exe().map_err(|error| error.to_string())?;
+    let config_path = yaml_client::config_path_for_executable(&executable)?;
+    match arguments.first().and_then(|value| value.to_str()) {
+        Some("--version") if arguments.len() == 1 => {
+            println!("DynCursor {}", env!("CARGO_PKG_VERSION"));
+            return Ok(());
         }
+        Some("--help") if arguments.len() == 1 => {
+            println!("DynCursor [--version | --check-config [FILE] | --stop | --reset-cursors]");
+            return Ok(());
+        }
+        Some("--check-config") if arguments.len() <= 2 => {
+            let path = arguments.get(1).map(PathBuf::from).unwrap_or(config_path);
+            yaml_client::Config::load(&path)?;
+            println!("配置有效：{}", path.display());
+            return Ok(());
+        }
+        Some("--stop") if arguments.len() == 1 => return instance::request_stop(),
+        Some("--reset-cursors") if arguments.len() == 1 => {
+            let _instance = instance::Instance::acquire()?;
+            if unsafe {
+                SystemParametersInfoW(
+                    SPI_SETCURSORS,
+                    0,
+                    std::ptr::null_mut(),
+                    SYSTEM_PARAMETERS_INFO_UPDATE_FLAGS(0),
+                )
+            }
+            .as_bool()
+            {
+                return Ok(());
+            }
+            return Err(format!("重置光标失败：{}", std::io::Error::last_os_error()));
+        }
+        None if arguments.is_empty() => {}
+        _ => return Err("未知参数，请使用 --help 查看用法".into()),
     }
+    let instance = instance::Instance::acquire()?;
+    let config = yaml_client::Config::load(&config_path)?;
+    // Relative paths inside log4rs.yaml must also use the application directory.
+    let directory = executable.parent().ok_or("无法确定程序目录")?;
+    std::env::set_current_dir(directory).map_err(|error| error.to_string())?;
+    if config.enable_logging {
+        log4rs::init_file(directory.join("config/log4rs.yaml"), Default::default())
+            .map_err(|error| format!("无法初始化日志：{}", error))?;
+        log_panics::init();
+        info!("DynCursor {} started", env!("CARGO_PKG_VERSION"));
+    }
+    listen_keyboard_layout(config, &instance)
 }
 
 fn main() {
-    init();
-    listen_keyboard_layout();
+    let arguments: Vec<_> = std::env::args_os().skip(1).collect();
+    if let Err(error) = run(&arguments) {
+        eprintln!("DynCursor: {}", error);
+        if arguments.is_empty() {
+            unsafe {
+                MessageBoxW(
+                    HWND::default(),
+                    error.as_str(),
+                    "DynCursor",
+                    MB_OK | MB_ICONERROR,
+                );
+            }
+        }
+        std::process::exit(1);
+    }
 }

@@ -1,0 +1,70 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - name: Verify version and release notes
+        shell: pwsh
+        run: |
+          $metadata = cargo metadata --locked --no-deps --format-version 1 | ConvertFrom-Json
+          $version = ($metadata.packages | Where-Object name -eq 'DynCursor').version
+          if ($env:GITHUB_REF_NAME -ne "v$version") { throw 'Tag does not match Cargo.toml' }
+          if (-not (Test-Path "releases/v$version.md")) { throw 'Missing release notes' }
+      - run: cargo fmt --check
+      - run: cargo clippy --locked --all-targets -- -D warnings
+      - run: cargo test --locked
+      - run: cargo build --locked --release
+      - name: Package and validate
+        shell: pwsh
+        run: ./scripts/package.ps1
+      - name: Upload assets and publish release
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const fs = require('fs');
+            const tag = context.ref.replace('refs/tags/', '');
+            const body = fs.readFileSync(`releases/${tag}.md`, 'utf8');
+            const repo = context.repo;
+            let release;
+            try {
+              release = (await github.rest.repos.getReleaseByTag({...repo, tag})).data;
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              release = (await github.rest.repos.createRelease({
+                ...repo, tag_name: tag, target_commitish: context.sha,
+                name: `DynCursor ${tag}`, body, draft: true, prerelease: false
+              })).data;
+            }
+            if (!release.draft) throw new Error('Release already published; refusing to replace it');
+            for (const name of ['DynCursor.zip', 'SHA256SUMS.txt']) {
+              const existing = release.assets.find(asset => asset.name === name);
+              if (existing) await github.rest.repos.deleteReleaseAsset({...repo, asset_id: existing.id});
+              await github.rest.repos.uploadReleaseAsset({
+                ...repo, release_id: release.id, name,
+                data: fs.readFileSync(`target/dist/release/${name}`),
+                headers: {'content-type': name.endsWith('.zip') ? 'application/zip' : 'text/plain'}
+              });
+            }
+            await github.rest.repos.updateRelease({
+              ...repo, release_id: release.id, body, draft: false,
+              prerelease: false, make_latest: 'true'
+            });
+            core.info(release.html_url);

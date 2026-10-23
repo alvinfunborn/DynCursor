@@ -1,6 +1,6 @@
 [package]
 name = "DynCursor"
-version = "0.1.0"
+version = "1.0.0"
 authors = ["zhouwenxiang <zhouwx@lanxi.com>"]
 edition = "2018"
 
@@ -10,12 +10,9 @@ winres = "0.1"
 [dependencies]
 # 基础组件
 log = "0.4"
-log4rs = "1.0"
+log4rs = "1.4"
 log-panics = "2.0"
-z_lib = { path = "z_lib" }
-lazy_static = "1.4"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+serde_yaml = "0.8.21"
 
 [dependencies.windows]
 version = "0.24"
@@ -28,6 +25,9 @@ features = [
     "Win32_UI_Input_KeyboardAndMouse",
     "Win32_System_Diagnostics_Debug",
     "Win32_System_Services",
+    "Win32_System_Threading",
+    "Win32_System_SystemServices",
+    "Win32_Security",
     "Win32_UI_WindowsAndMessaging",
     "Win32_UI_TextServices",
 ]

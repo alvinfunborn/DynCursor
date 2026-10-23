@@ -1,16 +1,18 @@
 # DynCursor
+
+[项目主页](https://alvinfunborn.github.io/DynCursor/) · [下载 v1.0.0](https://github.com/alvinfunborn/DynCursor/releases/latest) · [赞助说明](https://alvinfunborn.github.io/DynCursor/sponsor.html)
 ## Windows系统动态修改鼠标指针光标图标样式, 根据键盘布局/语言/输入法的切换而变化.
 
 假如在Windows上安装了多门语言, 使用时可能很难感知当前是什么语言什么输入法, 需要频繁查看任务栏语言图标或者直接打字来判断, 加上微软拼音输入法会"智能"切换中/英, 十分影响心态;
 
 此工具能帮助快速判断所用的输入法, 通过简单几步配置, 即可在使用英文时看到鼠标白色指针, 使用中文时看到鼠标黑色指针(也可以[下载](http://www.rw-designer.com/cursor-library/set-0)或自制其他颜色和图标的指针);
 
-实现思路是一直查询当前使用的语言输入法, 如果当前语言是`中文(简体,中国)`且输入法的[Conversion Mode](https://docs.microsoft.com/en-us/windows/win32/intl/ime-conversion-mode-values)非0, 则替换鼠标指针的状态
+实现思路是定期查询前台窗口的键盘布局和输入法状态。如果当前语言匹配配置，且输入法处于本地语言输入模式（`IME_CMODE_NATIVE`），则替换鼠标指针；普通键盘布局直接按语言编码匹配。默认配置针对`中文(简体,中国)`：
 1. `正常选择`<image src="resources/figure/aero_arrow.cur" height="20" width="20"></image>替换为`帮助选择`<image src="resources/figure/aero_helpsel.cur" height="20" width="20"></image>
 1. `文本选择`<image src="resources/figure/beam_r.cur" height="20" width="20"></image>替换为`候选`<image src="resources/figure/up_r.cur" height="20" width="20"></image>
 1. `链接选择`<image src="resources/figure/aero_link.cur" height="20" width="20"></image>替换为`不可用`<image src="resources/figure/aero_unavail.cur" height="20" width="20"></image>
 
-鼠标指针状态替换后, 原本显示`正常选择`<image src="resources/figure/aero_arrow.cur" height="20" width="20"></image>的地方会显示`帮助选择`<image src="resources/figure/aero_helpsel.cur" height="20" width="20"></image>, 原本显示`帮助选择`<image src="resources/figure/aero_helpsel.cur" height="20" width="20"></image>的地方会显示`正常选择`<image src="resources/figure/aero_arrow.cur" height="20" width="20"></image>, 因此只需要把`帮助选择`<image src="resources/figure/aero_helpsel.cur" height="20" width="20"></image>的图标修改成其他颜色指针<image src="resources/figure/arrow_r.cur" height="20" width="20"></image>, 即可优雅实现动态光标颜色; 其他鼠标指针状态同理;
+程序启动时会保存映射中涉及的光标副本。在自定义输入法状态下，目标光标使用替换光标的图案；切回默认状态时，目标光标恢复为启动时的图案。替换光标本身保持原样。因此只需要把`帮助选择`<image src="resources/figure/aero_helpsel.cur" height="20" width="20"></image>的图标修改成其他颜色指针<image src="resources/figure/arrow_r.cur" height="20" width="20"></image>，即可实现动态光标颜色；其他鼠标指针状态同理。
 默认取代`帮助选择`<image src="resources/figure/aero_helpsel.cur" height="20" width="20"></image>,`候选`<image src="resources/figure/up_r.cur" height="20" width="20"></image>,`不可用`<image src="resources/figure/aero_unavail.cur" height="20" width="20"></image>是因为这些指针状态极少出现, 或者可以在[配置文件](config/config.yaml)中修改成其他替换指针;
 
 ## 使用
@@ -35,8 +37,41 @@
         ![avatar](resources/figure/after-h.jpg)
 1. 建议关闭`鼠标属性-指针选项-在打字时隐藏指针`, 打开`当按CTRL键时显示指针的位置`
 1. 启动DynCursor.exe, 这是一个无窗体程序, 启动后切换输入法来查看效果
-1. 如果要停止运行, 打开任务管理器找到`DynCursor.exe`, 结束任务
-1. 如果要重置鼠标指针, 在`鼠标属性-指针`中选择任一方案应用
+1. 如果要停止运行，在程序目录运行 `DynCursor.exe --stop`，程序会恢复原始光标后退出。重复启动会提示已有实例运行。
+1. 如果程序曾被任务管理器强制结束，先确认它已经退出，再运行 `DynCursor.exe --reset-cursors` 重新加载 Windows 保存的指针方案；也可以在`鼠标属性-指针`中选择任一方案应用。强制终止进程时无法执行自动恢复。
+
+配置文件固定从 `DynCursor.exe` 所在目录的 `config/config.yaml` 读取，因此从快捷方式或其他工作目录启动也能使用。配置错误会显示具体原因。修改配置或系统指针方案后，请先退出程序再重新启动。
+
+命令行选项：
+
+```powershell
+.\DynCursor.exe --version
+.\DynCursor.exe --check-config
+.\DynCursor.exe --check-config C:\path\to\config.yaml
+.\DynCursor.exe --stop
+.\DynCursor.exe --reset-cursors
+```
+
+`--check-config` 仅校验配置并通过退出码报告结果（成功为 0），不会修改系统光标。输入法查询超时或前台窗口暂时不可用时，程序保留上一次光标状态，等待下次检测。
+
+## 从源码构建
+
+在安装了 Rust MSVC 工具链和 Visual Studio C++ Build Tools / Windows SDK 的 Windows 上运行：
+
+```powershell
+cargo test --locked
+cargo clippy --locked --all-targets -- -D warnings
+cargo build --locked --release
+Copy-Item config target/release -Recurse -Force
+```
+
+随后运行 `target/release/DynCursor.exe`。回归测试使用模拟光标，不修改桌面的系统指针。GitHub Actions 会执行检查并生成包含程序、配置及示例光标的便携 ZIP。
+
+当前版本为 `1.0.0`，源码版本、Windows 文件版本与 Git 标签保持一致。更新内容见 [CHANGELOG.md](CHANGELOG.md)。历史 `v0.2.1` 中的 `Cargo.toml` 曾保留 `0.1.0`，属于元数据未同步。
+
+## 支持项目
+
+欢迎通过 Star、反馈问题和改进文档支持维护。收款入口正在准备中，暂未开放；后续会统一更新[赞助说明页](https://alvinfunborn.github.io/DynCursor/sponsor.html)。
 
 ## 效果图
 - 使用个性化图标
@@ -69,7 +104,7 @@
 精确选择|十字|32515
 文本选择|I|32513
 不可用|斜线圆圈|32648
-垂直调整大小|南北向双向箭头|32654
+垂直调整大小|南北向双向箭头|32645
 水平调整大小|东西向双向箭头|32644
 沿对角线调整大小1|西北-东南的双向箭头|32642
 沿对角线调整大小2|东北-西南的双向箭头|32643

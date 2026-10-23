@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://alvinfunborn.github.io/DynCursor/sitemap.xml

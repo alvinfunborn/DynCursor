@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "main",
+  "description": "Local DynCursor settings window",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}

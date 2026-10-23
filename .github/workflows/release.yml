@@ -29,12 +29,15 @@ jobs:
           if ($env:GITHUB_REF_NAME -ne "v$version") { throw 'Tag does not match Cargo.toml' }
           if (-not (Test-Path "releases/v$version.md")) { throw 'Missing release notes' }
       - run: cargo fmt --check
+      - run: python scripts/check-assets.py
+      - run: node --test scripts/test-settings.cjs
+      - run: node --check ui/app.js
       - run: cargo clippy --locked --all-targets -- -D warnings
       - run: cargo test --locked
       - run: cargo build --locked --release
       - name: Package and validate
         shell: pwsh
-        run: ./scripts/package.ps1
+        run: ./scripts/package.ps1 -SmokeTest
       - name: Upload assets and publish release
         uses: actions/github-script@v9
         with:

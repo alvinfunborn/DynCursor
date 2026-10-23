@@ -1,5 +1,6 @@
 param(
-    [string]$Destination = 'target/dist/release'
+    [string]$Destination = 'target/dist/release',
+    [switch]$SmokeTest
 )
 
 $ErrorActionPreference = 'Stop'
@@ -20,14 +21,20 @@ try {
     New-Item -ItemType Directory -Path $staging | Out-Null
     try {
         Copy-Item -LiteralPath $executable -Destination $staging
-        Copy-Item -LiteralPath 'config','resources' -Destination $staging -Recurse
-        Copy-Item -LiteralPath 'README.md','CHANGELOG.md' -Destination $staging
+        Copy-Item -LiteralPath 'config' -Destination $staging -Recurse
+        $resourceOutput = Join-Path $staging 'resources'
+        New-Item -ItemType Directory -Path (Join-Path $resourceOutput 'cur') -Force | Out-Null
+        Copy-Item -LiteralPath 'resources/logo.ico','resources/logo.png','resources/logo.svg' -Destination $resourceOutput
+        Copy-Item -LiteralPath 'resources/cursor-source' -Destination $resourceOutput -Recurse
+        Copy-Item -LiteralPath 'resources/cur/custom-arrow.cur','resources/cur/custom-beam.cur','resources/cur/custom-link.cur' -Destination (Join-Path $resourceOutput 'cur')
+        Copy-Item -LiteralPath 'README.md','CHANGELOG.md','LICENSE','THIRD_PARTY_NOTICES.md','THIRD_PARTY_LICENSES.txt' -Destination $staging
         $check = Start-Process -FilePath (Join-Path $staging 'DynCursor.exe') `
             -ArgumentList '--check-config' -WorkingDirectory $temporaryRoot `
             -WindowStyle Hidden -Wait -PassThru `
             -RedirectStandardOutput (Join-Path $output 'check-config.stdout.txt') `
             -RedirectStandardError (Join-Path $output 'check-config.stderr.txt')
         if ($check.ExitCode -ne 0) { throw 'Packaged configuration validation failed' }
+        if ($SmokeTest) { & "$PSScriptRoot/test-gui.ps1" -Executable (Join-Path $staging 'DynCursor.exe') }
         $zipPath = Join-Path $output 'DynCursor.zip'
         Compress-Archive -Path (Join-Path $staging '*') -DestinationPath $zipPath -Force
         $checksum = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash.ToLowerInvariant()

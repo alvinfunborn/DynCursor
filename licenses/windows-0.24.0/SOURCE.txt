@@ -1,0 +1,3 @@
+Upstream notices retrieved at the exact crate VCS revision:
+https://raw.githubusercontent.com/microsoft/windows-rs/8f94cfedd843fe8e2e5b7d4579d14004f7ca2a9d/.github/license-apache
+https://raw.githubusercontent.com/microsoft/windows-rs/8f94cfedd843fe8e2e5b7d4579d14004f7ca2a9d/.github/license-mit

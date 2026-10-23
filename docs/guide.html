@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Windows 图文设置指南 — DynCursor</title>
+  <meta name="description" content="按 README 的实际截图，逐步配置 Windows 鼠标属性中的帮助选择、候选和不可用指针，了解 DynCursor 的 YAML 配置、启动、退出、恢复和开机自启。">
+  <meta name="theme-color" content="#f6f7f2">
+  <link rel="canonical" href="https://alvinfunborn.github.io/DynCursor/guide.html">
+  <link rel="icon" href="assets/logo.ico">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+  <div class="page-shell">
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="返回 DynCursor 首页"><img class="brand-icon" src="assets/logo.svg" width="32" height="32" alt="">DynCursor<span class="brand-dot">.</span></a>
+      <nav aria-label="主导航"><a href="./">首页</a><a href="guide.html" aria-current="page">设置指南</a><a href="https://github.com/alvinfunborn/DynCursor">GitHub ↗</a><a href="sponsor.html">支持项目 ↗</a></nav>
+    </header>
+    <main id="main" class="guide-main">
+      <div class="guide-intro">
+        <p class="section-kicker">WINDOWS SETUP / v1.1.0</p>
+        <h1>先配好指针，<br>再让它跟着输入法变。</h1>
+        <p>1.1.0 新增设置窗口与托盘。推荐先用窗口直接选择 .cur 文件，无需先改 Windows 的来源指针。需要复用系统方案时，再按下面沿用 README 九张截图的详细流程设置。</p>
+        <div class="guide-notice"><strong>修改 Windows 方案前先暂停，并备份原方案。</strong><p>从窗口点击「Windows 指针设置」会先暂停并恢复原始光标；应用系统修改后点「重新捕获并恢复运行」。也可先退出，再修改和重启。</p></div>
+      </div>
+      <div class="guide-layout">
+        <aside class="guide-toc" aria-label="设置指南目录"><strong>按顺序完成</strong><ol><li><a href="#prepare">下载、解压与备份</a></li><li><a href="#window">窗口快速配置</a></li><li><a href="#open-settings">打开鼠标属性</a></li><li><a href="#mapping">理解三个指针映射</a></li><li><a href="#pointer-help">设置「帮助选择」</a></li><li><a href="#pointer-alternate">设置「候选」</a></li><li><a href="#pointer-unavailable">设置「不可用」</a></li><li><a href="#apply-settings">应用与指针选项</a></li><li><a href="#configuration">检查配置文件</a></li><li><a href="#start">启动与验证效果</a></li><li><a href="#restore">退出与完整还原</a></li><li><a href="#startup">开机自启</a></li><li><a href="#troubleshooting">常见问题排查</a></li></ol></aside>
+        <article class="guide-content">
+          <section id="prepare" class="guide-step">
+            <p class="section-kicker">01 / PREPARE</p><h2>下载、完整解压，先留好退路。</h2>
+            <ol><li>从 <a href="https://github.com/alvinfunborn/DynCursor/releases/latest">GitHub Releases</a> 下载 <code>DynCursor.zip</code>。</li><li>完整解压到一个固定目录，例如 <code>D:\Apps\DynCursor</code>。保留程序旁的 <code>config</code> 和 <code>resources</code> 文件夹。程序目录需要可写。</li><li>如果旧版正在运行，先退出。历史 <code>v0.2.1</code> 不支持 <code>--stop</code>，需要在任务管理器中结束旧进程。</li><li>打开下面的「鼠标属性 → 指针」，记住当前方案；如果已有自定义指针，点「另存为」，保存为例如 <code>DynCursor-原始方案</code>，便于之后完整还原。</li></ol>
+            <div class="guide-note">Windows 会记住你选择的光标文件路径。配置完成后，请保留光标文件所在目录；移动整个解压目录后需要重新选择文件。</div>
+          </section>
+          <section id="window" class="guide-step">
+            <p class="section-kicker">QUICK SETUP / SETTINGS WINDOW</p><h2>推荐：在设置窗口直接选择光标。</h2>
+            <ol><li>确认系统已安装 <a href="https://developer.microsoft.com/microsoft-edge/webview2/">Microsoft Edge WebView2 Runtime</a>，双击 <code>DynCursor.exe</code> 打开设置。新版默认使用包内三枚原创绿色光标，与系统原图案区分。</li><li>进入「光标外观」，分别检查普通选择、文本选择和链接选择。可点击「选择文件」使用自己的静态 <code>.cur</code>（最多 2 MB），旁边显示文件预览；勾选框控制该类光标是否参与切换。</li><li>点「保存并应用」。这只修改 DynCursor 的配置，不会把自定义文件写入 Windows 保存的指针方案。直接文件优先；清空文件后，才使用下方配置的 Windows 来源。</li><li>「输入与检测」设置语言编码、检测间隔与稳定时间；「启动与托盘」设置登录自启、启动隐藏和关闭行为；「诊断与帮助」提供配置、日志和恢复入口。</li><li>在记事本切换微软拼音中英文状态验证。关闭窗口默认继续驻留托盘；左键图标显示设置，右键可暂停、打开 Windows 指针设置、重新捕获或退出。再次双击程序也会唤出已有窗口。</li></ol>
+            <div class="guide-note">需要让 Windows 的「帮助选择 / 候选 / 不可用」本身也使用自定义图案，或希望复用现有系统方案时，再继续下面的手动设置。使用直接文件时，可以跳到<a href="#apply-settings">指针可见性</a>和<a href="#start">效果验证</a>。</div>
+          </section>
+          <section id="open-settings" class="guide-step">
+            <p class="section-kicker">02 / WINDOWS SETTINGS</p><h2>打开「鼠标属性」的「指针」页。</h2>
+            <p>在 Windows 10 / 11 中，按 <kbd>Win</kbd> + <kbd>R</kbd>，输入 <code>main.cpl</code> 并回车，然后选择「指针」选项卡。</p>
+            <div class="guide-command"><code>main.cpl</code><button type="button" data-command="main.cpl" data-copy-message="已复制 main.cpl，请按 Win + R 后粘贴运行。" aria-label="复制打开鼠标属性的命令">复制命令</button></div>
+            <p>也可以通过设置进入：Windows 11 的「设置 → 蓝牙和设备 → 鼠标 → 其他鼠标设置」，或 Windows 10 的「设置 → 设备 → 鼠标 → 其他鼠标选项」。</p>
+            <p>接下来使用「指针」页里的<strong>「自定义」列表和「浏览」按钮</strong>，选择每个状态的 <code>.cur</code> 文件。入口可参考 <a href="https://support.microsoft.com/zh-cn/windows/hardware/input-devices/change-mouse-settings">Microsoft 鼠标设置说明</a>。</p>
+          </section>
+          <section id="mapping" class="guide-step">
+            <p class="section-kicker">03 / HOW THE MAPPING WORKS</p><h2>使用系统方案时，修改三个「来源」状态。</h2>
+            <p>在设置窗口清空对应的直接文件后，中文输入状态会把右侧来源的图案复制给左侧目标。请为来源选一个与默认图案容易区分的颜色或形状；进入默认输入状态时，目标会恢复为程序启动时保存的图案。</p>
+            <div class="table-scroll"><table class="guide-table"><thead><tr><th>中文时改变的目标</th><th>在 Windows 中设置的来源</th><th>当前包内示例</th><th>配置映射</th></tr></thead><tbody><tr><td>正常选择（箭头）</td><td><a href="#pointer-help">帮助选择</a></td><td><code>custom-arrow.cur</code></td><td><code>32512:32651</code></td></tr><tr><td>文本选择（I 形）</td><td><a href="#pointer-alternate">候选</a></td><td><code>custom-beam.cur</code></td><td><code>32513:32516</code></td></tr><tr><td>链接选择（手形）</td><td><a href="#pointer-unavailable">不可用</a></td><td><code>custom-link.cur</code></td><td><code>32649:32648</code></td></tr></tbody></table></div>
+            <p>这三个来源状态本身也会显示你选定的图案。之所以默认使用它们，是因为日常出现频率相对较低。直接选择文件不会改写 Windows 已保存的来源指针方案；运行时会临时替换目标光标，退出时恢复。新版附带原创图案，也可以使用自己的文件。</p>
+            <div class="guide-note"><strong>截图文件名对照：</strong>下面沿用 README 的历史截图。截图中出现的 <code>arrow_r.cur</code>、<code>beam_r.cur</code> 等旧文件名与路径不必照抄，按当前包内文件名或自己已有的图案选择即可。新版三个 custom-*.cur 已替换为原创图案，外观与历史截图不同。其余历史下载素材的授权尚未全部核实，二次分发请先阅读 <a href="https://github.com/alvinfunborn/DynCursor/blob/main/THIRD_PARTY_NOTICES.md">素材说明</a>，也可直接使用自己制作或已有授权的光标。</div>
+          </section>
+          <section id="pointer-help" class="guide-step">
+            <p class="section-kicker">04 / ARROW</p><h2>「帮助选择」→ 中文状态下的箭头。</h2>
+            <ol><li>在「自定义」列表选中<strong>帮助选择</strong>（原图通常是箭头加问号）。</li><li>点「浏览」，进入解压目录的 <code>resources\cur</code>，选择 <code>custom-arrow.cur</code> 或你准备的另一种箭头图案，点「打开」。</li><li>确认列表右侧和预览区中的「帮助选择」已经变成你选择的箭头图案。</li></ol>
+            <div class="setup-gallery"><figure><a href="assets/setup/before-a.jpg"><img src="assets/setup/before-a.jpg" alt="鼠标属性的指针页，在自定义列表中选中帮助选择，原图为箭头加问号" loading="lazy" width="462" height="574"></a><figcaption>① 选中「帮助选择」</figcaption></figure><figure><a href="assets/setup/search-a.jpg"><img src="assets/setup/search-a.jpg" alt="浏览光标文件的窗口，历史截图选中了 arrow_r.cur；当前包可选择 custom-arrow.cur" loading="lazy" width="555" height="520"></a><figcaption>② 浏览并选择箭头文件</figcaption></figure><figure><a href="assets/setup/after-a.jpg"><img src="assets/setup/after-a.jpg" alt="帮助选择设置后的预览，原来的问号箭头已变成另一种箭头图案" loading="lazy" width="462" height="576"></a><figcaption>③ 确认图案已改变</figcaption></figure></div>
+          </section>
+          <section id="pointer-alternate" class="guide-step">
+            <p class="section-kicker">05 / TEXT</p><h2>「候选」→ 中文状态下的 I 形指针。</h2>
+            <ol><li>在「自定义」列表向下滚动，选中<strong>候选</strong>（原图通常是向上的箭头）。</li><li>点「浏览」，选择 <code>resources\cur\custom-beam.cur</code> 或另一种容易辨认的 I 形图案，点「打开」。</li><li>确认「候选」的预览已经变成选中的文本指针图案。</li></ol>
+            <div class="setup-gallery"><figure><a href="assets/setup/before-i.jpg"><img src="assets/setup/before-i.jpg" alt="鼠标指针列表滚动到候选，选中原来为向上箭头的候选状态" loading="lazy" width="462" height="576"></a><figcaption>① 选中「候选」</figcaption></figure><figure><a href="assets/setup/search-i.jpg"><img src="assets/setup/search-i.jpg" alt="浏览并选择文本光标文件，当前包可选择 custom-beam.cur" loading="lazy" width="553" height="520"></a><figcaption>② 选择 I 形指针文件</figcaption></figure><figure><a href="assets/setup/after-i.jpg"><img src="assets/setup/after-i.jpg" alt="候选设置后的预览，已变成文本选择使用的 I 形图案" loading="lazy" width="460" height="575"></a><figcaption>③ 确认 I 形预览</figcaption></figure></div>
+          </section>
+          <section id="pointer-unavailable" class="guide-step">
+            <p class="section-kicker">06 / LINK</p><h2>「不可用」→ 中文状态下的链接指针。</h2>
+            <ol><li>在「自定义」列表选中<strong>不可用</strong>（原图通常是带斜线的圆圈）。</li><li>点「浏览」，选择 <code>resources\cur\custom-link.cur</code> 或另一种手形图案，点「打开」。</li><li>确认「不可用」的预览已经变成选中的手形图案。</li></ol>
+            <div class="setup-gallery"><figure><a href="assets/setup/before-h.jpg"><img src="assets/setup/before-h.jpg" alt="鼠标指针列表选中不可用，原图为斜线圆圈" loading="lazy" width="463" height="580"></a><figcaption>① 选中「不可用」</figcaption></figure><figure><a href="assets/setup/search-h.jpg"><img src="assets/setup/search-h.jpg" alt="浏览并选择链接指针文件，当前包可选择 custom-link.cur" loading="lazy" width="555" height="521"></a><figcaption>② 选择手形指针文件</figcaption></figure><figure><a href="assets/setup/after-h.jpg"><img src="assets/setup/after-h.jpg" alt="不可用设置后的预览，已变成链接选择使用的手形图案" loading="lazy" width="462" height="577"></a><figcaption>③ 确认手形预览</figcaption></figure></div>
+            <p class="image-hint">点击任意截图可查看原图；返回浏览器上一页即可回到指南。</p>
+          </section>
+          <section id="apply-settings" class="guide-step">
+            <p class="section-kicker">07 / APPLY</p><h2>应用设置，再调整指针可见性。</h2>
+            <ol><li>三项都设置好后，点「应用」。可以在「指针」页点「另存为」，把当前组合保存成 <code>DynCursor-自定义</code>。</li><li>切到「指针选项」，按需<strong>取消勾选「在打字时隐藏指针」</strong>，便于输入时观察 I 形指针。</li><li>可选：勾选「当按 CTRL 键时显示指针的位置」，方便找到光标。</li><li>点「应用」或「确定」保存。使用窗口配置时无需重启；如果修改了系统方案，请回到窗口点「重新捕获并恢复运行」。已退出的用户此时再启动程序。</li></ol>
+          </section>
+          <section id="configuration" class="guide-step">
+            <p class="section-kicker">08 / CONFIGURATION</p><h2>默认配置可直接使用。</h2>
+            <p>程序固定读取 <code>DynCursor.exe</code> 旁边的 <code>config\config.yaml</code>。窗口会保存设置，通常不需要手动编辑。兼容旧版的三个基础字段如下（新版另含直接光标文件、检测及窗口选项）：</p>
+            <pre><code>custom-layout: 0804
+cursor-mapping: 32512:32651, 32513:32516, 32649:32648
+enable-logging: false</code></pre>
+            <ul><li><code>custom-layout</code>：四位十六进制语言编码。<code>0804</code> 是简体中文；多个编码用英文逗号分隔。普通键盘布局直接按编码匹配，中文等输入法还会检查本地语言输入模式。</li><li><code>cursor-mapping</code>：十进制的 <strong>目标:来源</strong>，多个映射用英文逗号分隔，目标编码不能重复。</li><li><code>enable-logging</code>：设为 <code>true</code> 开启日志，日志设置在 <code>config\log4rs.yaml</code>，默认日志路径为程序目录下的 <code>log\info.log</code>。</li></ul>
+            <p>手动修改 YAML 后，在「诊断与帮助」点「重新读取配置」；修改 Windows 方案后点「重新捕获并恢复运行」。也可以退出再重启。更多语言与指针编码见 <a href="https://github.com/alvinfunborn/DynCursor#附录">README 附录</a>。</p>
+            <details class="guide-details"><summary>可选：启动前验证配置</summary><p>在程序目录的空白处右键，选择「在终端中打开」，使用 PowerShell：</p><pre><code>$check = Start-Process .\DynCursor.exe -ArgumentList '--check-config' -Wait -PassThru
+$check.ExitCode</code></pre><p><code>0</code> 表示配置有效；非 <code>0</code> 表示未通过。该命令只校验 YAML，不改变系统光标；它不会自动弹出程序窗口。</p></details>
+          </section>
+          <section id="start" class="guide-step">
+            <p class="section-kicker">09 / TRY IT</p><h2>启动程序，分别验证三种指针。</h2>
+            <ol><li>双击 <code>DynCursor.exe</code>。默认显示设置窗口并创建托盘图标；如果设为隐藏启动，点击托盘图标或再次打开程序显示窗口。概览可查看运行状态、语言编码与错误提示。</li><li>打开记事本，把焦点放到文本区域。用 <kbd>Win</kbd> + <kbd>Space</kbd> 选择微软拼音，再按你的输入法设置切换「中 / 英」（通常是 <kbd>Shift</kbd>）。</li><li>在中文和英文输入状态间切换：普通区域应看到箭头图案变化，文本区域应看到 I 形图案变化；测试链接时，把鼠标移到支持系统手形指针的链接上。</li><li>如果程序或网页没有立即重绘指针，将鼠标移出该区域再移回。效果仍无变化时，按下方排查表逐项检查。</li></ol>
+            <div class="guide-note">网页首页的按钮只是交互示意。桌面实际效果取决于窗口选择的文件或 Windows 来源图案、当前前台窗口的输入法，以及应用是否使用系统指针。</div>
+          </section>
+          <section id="restore" class="guide-step">
+            <p class="section-kicker">10 / STOP &amp; RESTORE</p><h2>正常退出与完整还原，是两步不同的操作。</h2>
+            <h3>正常停止动态切换</h3><p>只想临时停止，可在概览或托盘点击「暂停并恢复原始光标」。彻底退出时，托盘右键选「恢复光标并退出」，或在程序目录打开终端运行：</p><div class="guide-command"><code>.\DynCursor.exe --stop</code><button type="button" data-command=".\DynCursor.exe --stop" data-copy-message="退出命令已复制，请在程序目录运行。" aria-label="复制正常退出命令">复制命令</button></div><p>稍等片刻，程序恢复启动时保存的<strong>目标光标</strong>并退出。你在 Windows 中预先设置的「帮助选择 / 候选 / 不可用」图案仍是自己的设置。</p>
+            <h3>强制结束后恢复系统保存的方案</h3><p>如果被任务管理器强制结束，先确认进程已退出，再运行：</p><div class="guide-command"><code>.\DynCursor.exe --reset-cursors</code><button type="button" data-command=".\DynCursor.exe --reset-cursors" data-copy-message="重置命令已复制，请确认进程退出后在程序目录运行。" aria-label="复制重载指针方案命令">复制命令</button></div><p>这个命令重新加载 Windows 当前保存的指针方案，<strong>不是恢复出厂默认图案</strong>。强制终止进程时无法执行正常退出的自动恢复。</p>
+            <h3>把 Windows 指针也彻底还原</h3><ol><li>先退出 DynCursor。</li><li>按 <kbd>Win</kbd> + <kbd>R</kbd>，运行 <code>main.cpl</code>，打开「指针」页。</li><li>在「方案」中选择第一步保存的原始方案，或自己需要的 Windows 系统方案，点「应用」。这会同时还原三个来源状态。</li></ol>
+          </section>
+          <section id="startup" class="guide-step">
+            <p class="section-kicker">11 / STARTUP</p><h2>可选：设置登录后自动启动。</h2>
+            <ol><li>在设置窗口「启动与托盘」开启「登录 Windows 后自动启动」，无需管理员权限；这个开关立即生效，登录后直接驻留托盘。</li><li>移动程序目录后，关闭再重新开启开关，更新启动路径。之前手工放入启动目录的快捷方式应删除，避免重复。</li></ol><h3>兼容方式：手动创建启动快捷方式</h3><ol><li>不要同时启用上面的开关。按 <kbd>Win</kbd> + <kbd>R</kbd>，运行 <code>shell:startup</code>，打开当前用户的启动文件夹。</li><li>为固定目录中的 <code>DynCursor.exe</code> 创建快捷方式，把<strong>快捷方式</strong>放到启动文件夹。程序和配置文件保留在原目录。</li><li>以后登录 Windows 时会自动启动。取消自启时，删除该快捷方式；升级或移动程序后，检查快捷方式是否仍指向正确目录。</li></ol>
+          </section>
+          <section id="troubleshooting" class="guide-step">
+            <p class="section-kicker">12 / TROUBLESHOOTING</p><h2>没有看到变化？按这个顺序检查。</h2>
+            <div class="table-scroll"><table class="guide-table"><thead><tr><th>现象</th><th>检查与处理</th></tr></thead><tbody><tr><td>启动后没窗口</td><td>检查托盘折叠区域；再次双击程序可唤出设置。首次无法打开时检查 WebView2 Runtime，配置错误会在窗口内提示并暂停。</td></tr><tr><td>中文英文看起来一样</td><td>检查「启用自动切换」与三类勾选框，选定不同图案后保存并应用；使用系统来源时，确认来源已设置并重新捕获。</td></tr><tr><td>打字时看不见 I 形指针</td><td>到「指针选项」取消「在打字时隐藏指针」。</td></tr><tr><td>改了配置却不生效</td><td>窗口内点「保存并应用」；手动编辑后点「重新读取配置」。检查文件路径、映射方向和概览错误提示。</td></tr><tr><td>部分软件或第三方输入法无效</td><td>应用可能使用自定义指针，或输入法没有报告可读取的状态。先在记事本与微软拼音环境验证，再反馈具体应用与输入法。</td></tr><tr><td>升级后图案混乱</td><td>检查有没有历史旧版同时运行。先结束旧进程、重载 Windows 指针方案，再启动一个新版实例。</td></tr><tr><td>退出后「帮助选择」仍是自定义图案</td><td>这是预先保存的 Windows 设置；要完整还原，请按上方步骤应用原始指针方案。</td></tr></tbody></table></div>
+            <p>仍有问题时，请在 <a href="https://github.com/alvinfunborn/DynCursor/issues">GitHub Issues</a> 提供 Windows 版本、输入法、应用名称、配置内容和复现步骤。</p>
+          </section>
+          <p id="copy-status" class="copy-status" role="status"></p>
+          <div class="guide-end"><a class="button primary" href="https://github.com/alvinfunborn/DynCursor/releases/latest/download/DynCursor.zip">下载 Windows 版 ↓</a><a class="text-link" href="./">返回项目首页 ↗</a></div>
+        </article>
+      </div>
+    </main>
+    <footer class="site-footer"><a class="brand" href="./"><img class="brand-icon" src="assets/logo.svg" width="32" height="32" alt="">DynCursor<span class="brand-dot">.</span></a><p>让输入状态，在光标上看得见。</p><div><a href="https://github.com/alvinfunborn/DynCursor/blob/main/LICENSE">MIT License</a><a href="https://github.com/alvinfunborn/DynCursor/blob/main/THIRD_PARTY_NOTICES.md">素材与组件说明</a><a href="sponsor.html">赞助说明 ↗</a></div><small>© 2026 alvinfunborn · 本页截图沿用项目 README。</small></footer>
+  </div>
+</body>
+</html>

@@ -7,6 +7,7 @@ use windows::{
 
 const MUTEX_NAME: &str = "Local\\DynCursor.Instance";
 const STOP_EVENT_NAME: &str = "Local\\DynCursor.Stop";
+const SHOW_EVENT_NAME: &str = "Local\\DynCursor.Stop.Show";
 
 struct OwnedHandle(HANDLE);
 
@@ -19,6 +20,7 @@ impl Drop for OwnedHandle {
 }
 
 pub struct Instance {
+    show: OwnedHandle,
     // Drop the stop event before releasing the instance lock.
     stop: OwnedHandle,
     _mutex: OwnedHandle,
@@ -27,6 +29,11 @@ pub struct Instance {
 impl Instance {
     pub fn acquire() -> Result<Self, String> {
         Self::acquire_named(MUTEX_NAME, STOP_EVENT_NAME)
+    }
+
+    pub fn acquire_smoke_test() -> Result<Self, String> {
+        let name = format!("Local\\DynCursor.Smoke.{}", std::process::id());
+        Self::acquire_named(&format!("{}.Mutex", name), &format!("{}.Stop", name))
     }
 
     fn acquire_named(mutex_name: &str, stop_event_name: &str) -> Result<Self, String> {
@@ -44,8 +51,22 @@ impl Instance {
             if handle.0 == 0 {
                 return Err(format!("无法创建退出事件：{}", io::Error::last_os_error()));
             }
+            let stop = OwnedHandle(handle);
+            let show = CreateEventW(
+                ptr::null(),
+                false,
+                false,
+                format!("{}.Show", stop_event_name).as_str(),
+            );
+            if show.0 == 0 {
+                return Err(format!(
+                    "无法创建窗口显示事件：{}",
+                    io::Error::last_os_error()
+                ));
+            }
             Ok(Self {
-                stop: OwnedHandle(handle),
+                show: OwnedHandle(show),
+                stop,
                 _mutex: mutex,
             })
         }
@@ -59,6 +80,30 @@ impl Instance {
             Ok(false)
         } else {
             Err(format!("等待退出事件失败：{}", io::Error::last_os_error()))
+        }
+    }
+
+    pub fn show_requested(&self) -> bool {
+        unsafe { WaitForSingleObject(self.show.0, 0) == WAIT_OBJECT_0 }
+    }
+}
+
+pub fn request_show() -> Result<bool, String> {
+    unsafe {
+        let handle = OpenEventW(EVENT_MODIFY_STATE, false, SHOW_EVENT_NAME);
+        if handle.0 == 0 {
+            let error = io::Error::last_os_error();
+            return if error.raw_os_error() == Some(ERROR_FILE_NOT_FOUND.0 as i32) {
+                Ok(false)
+            } else {
+                Err(error.to_string())
+            };
+        }
+        let event = OwnedHandle(handle);
+        if SetEvent(event.0).as_bool() {
+            Ok(true)
+        } else {
+            Err(io::Error::last_os_error().to_string())
         }
     }
 }
@@ -99,6 +144,10 @@ mod tests {
         let instance = Instance::acquire_named(&mutex_name, &stop_name).unwrap();
         assert!(Instance::acquire_named(&mutex_name, &stop_name).is_err());
         assert!(!instance.stopping(0).unwrap());
+        assert!(!instance.show_requested());
+        assert!(unsafe { SetEvent(instance.show.0) }.as_bool());
+        assert!(instance.show_requested());
+        assert!(!instance.show_requested());
         request_stop_named(&stop_name).unwrap();
         assert!(instance.stopping(0).unwrap());
         drop(instance);

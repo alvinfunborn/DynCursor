@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <title>DynCursor · 双态光标</title>
+  <defs><clipPath id="cursor"><path d="M66 39v146l38-35 28 63 33-15-28-61h56z"/></clipPath></defs>
+  <rect width="256" height="256" rx="58" fill="#202821"/>
+  <path d="M66 39v146l38-35 28 63 33-15-28-61h56z" fill="#f7f8f2"/>
+  <path d="M126 24h100v210H126z" fill="#c8ed87" clip-path="url(#cursor)"/>
+  <circle cx="192" cy="62" r="18" fill="#c8ed87"/>
+</svg>

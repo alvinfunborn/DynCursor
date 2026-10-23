@@ -1,0 +1,5 @@
+License text: https://www.mozilla.org/en-US/MPL/2.0/
+Unmodified source, including original per-file copyright notices, is available at:
+https://crates.io/api/v1/crates/selectors/0.38.0/download
+https://github.com/servo/stylo/tree/572ecba2d1600e7c3d490586692a209faf703baa/selectors
+DynCursor does not modify this component.

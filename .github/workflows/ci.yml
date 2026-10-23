@@ -15,13 +15,16 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
+      - run: python scripts/check-assets.py
+      - run: node --test scripts/test-settings.cjs
+      - run: node --check ui/app.js
       - run: cargo fmt --check
       - run: cargo clippy --locked --all-targets -- -D warnings
       - run: cargo test --locked
       - run: cargo build --locked --release
       - name: Package portable app
         shell: pwsh
-        run: ./scripts/package.ps1
+        run: ./scripts/package.ps1 -SmokeTest
       - uses: actions/upload-artifact@v4
         with:
           name: DynCursor-windows-x64

@@ -1,6 +1,8 @@
 # DynCursor
 
-[项目主页](https://alvinfunborn.github.io/DynCursor/) · [下载 v1.0.0](https://github.com/alvinfunborn/DynCursor/releases/latest) · [赞助说明](https://alvinfunborn.github.io/DynCursor/sponsor.html)
+[项目主页](https://alvinfunborn.github.io/DynCursor/) · [Windows 图文设置指南](https://alvinfunborn.github.io/DynCursor/guide.html) · [下载 v1.1.0](https://github.com/alvinfunborn/DynCursor/releases/latest) · [赞助说明](https://alvinfunborn.github.io/DynCursor/sponsor.html)
+1.1.0 提供设置窗口、托盘菜单、登录自启动和直接选择光标文件，默认附带三枚原创光标。下方保留 Windows 来源映射的原理与手动配置说明。
+
 ## Windows系统动态修改鼠标指针光标图标样式, 根据键盘布局/语言/输入法的切换而变化.
 
 假如在Windows上安装了多门语言, 使用时可能很难感知当前是什么语言什么输入法, 需要频繁查看任务栏语言图标或者直接打字来判断, 加上微软拼音输入法会"智能"切换中/英, 十分影响心态;
@@ -15,32 +17,44 @@
 程序启动时会保存映射中涉及的光标副本。在自定义输入法状态下，目标光标使用替换光标的图案；切回默认状态时，目标光标恢复为启动时的图案。替换光标本身保持原样。因此只需要把`帮助选择`<image src="resources/figure/aero_helpsel.cur" height="20" width="20"></image>的图标修改成其他颜色指针<image src="resources/figure/arrow_r.cur" height="20" width="20"></image>，即可实现动态光标颜色；其他鼠标指针状态同理。
 默认取代`帮助选择`<image src="resources/figure/aero_helpsel.cur" height="20" width="20"></image>,`候选`<image src="resources/figure/up_r.cur" height="20" width="20"></image>,`不可用`<image src="resources/figure/aero_unavail.cur" height="20" width="20"></image>是因为这些指针状态极少出现, 或者可以在[配置文件](config/config.yaml)中修改成其他替换指针;
 
-## 使用
-1. 下载[DynCursor.zip](https://github.com/alvinfunborn/DynCursor/releases), 解压到任意目录, 无需安装
-1. 按需修改配置文件[config/config.yaml](config/config.yaml)
-    > 默认配置是在输入法为`中文(简体,中国)`时修改`标准箭头`<image src="resources/figure/aero_arrow.cur" height="20" width="20"></image>和`文本选择`<image src="resources/figure/beam_r.cur" height="20" width="20"></image>和`链接选择`<image src="resources/figure/aero_link.cur" height="20" width="20"></image>的样式; 其他光标保持不变;
-1. 建议修改`鼠标属性-指针`自定义里的图标, 会有更好的观感, 在resources/cur目录里有已下载的一些图标, 也可以在[rw designer](http://www.rw-designer.com/cursor-library/set-0)挑选合适的图标
-    1. 修改`帮助选择`样式
+## 使用（1.1.0 窗口版）
 
-        ![avatar](resources/figure/before-a.jpg)
-        ![avatar](resources/figure/search-a.jpg)
-        ![avatar](resources/figure/after-a.jpg)
-    1. 修改`候选`样式
+要求 Windows 10 / 11 x64 和 [Microsoft Edge WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/)。下载 ZIP 后完整解压到可写的固定目录，无需管理员权限。升级前先退出旧版；0.2.1 需要从任务管理器退出。
 
-        ![avatar](resources/figure/before-i.jpg)
-        ![avatar](resources/figure/search-i.jpg)
-        ![avatar](resources/figure/after-i.jpg)
-    1. 修改`不可用`样式
+1. 双击 `DynCursor.exe`，默认打开设置窗口；新版附带三枚原创绿色光标，首次无需修改 Windows 来源指针。
+2. **光标外观**：启用/停用三类光标，直接选择自己的静态 `.cur` 文件并预览（不支持 `.ani`，最大 2 MB），点“保存并应用”。留空文件时才使用 Windows 来源映射；其他高级映射会保留。
+3. **输入与检测**：选择语言编码（默认简体中文 `0804`），调整检测间隔（50–2000 ms）和稳定时间（0–2000 ms）。
+4. **启动与托盘**：登录自启动立即生效；可选择手动启动时隐藏、关闭窗口保留托盘。登录自启动始终后台启动；移动文件夹后请关闭再开启自启。
+5. **概览**：查看输入状态，暂停/恢复，快速打开 Windows 指针设置、光标文件夹。修改 Windows 方案前先暂停，应用后“重新捕获并恢复运行”。
+6. **诊断与帮助**：打开配置/日志目录，重新读取 YAML、恢复光标、查看指南。配置文件固定为 EXE 旁的 `config/config.yaml`，错误会显示在窗口中并暂停启动。
 
-        ![avatar](resources/figure/before-h.jpg)
-        ![avatar](resources/figure/search-h.jpg)
-        ![avatar](resources/figure/after-h.jpg)
-1. 建议关闭`鼠标属性-指针选项-在打字时隐藏指针`, 打开`当按CTRL键时显示指针的位置`
-1. 启动DynCursor.exe, 这是一个无窗体程序, 启动后切换输入法来查看效果
-1. 如果要停止运行，在程序目录运行 `DynCursor.exe --stop`，程序会恢复原始光标后退出。重复启动会提示已有实例运行。
-1. 如果程序曾被任务管理器强制结束，先确认它已经退出，再运行 `DynCursor.exe --reset-cursors` 重新加载 Windows 保存的指针方案；也可以在`鼠标属性-指针`中选择任一方案应用。强制终止进程时无法执行自动恢复。
+关闭窗口默认只隐藏，后台继续运行。左键托盘图标打开设置，右键可暂停、打开 Windows 指针设置、重新捕获和退出。再次双击程序会唤出已有窗口。退出使用“恢复光标并退出”或 `--stop`；强制结束进程无法执行自动恢复。
 
-配置文件固定从 `DynCursor.exe` 所在目录的 `config/config.yaml` 读取，因此从快捷方式或其他工作目录启动也能使用。配置错误会显示具体原因。修改配置或系统指针方案后，请先退出程序再重新启动。
+窗口设置以草稿形式编辑，点击“保存并应用”才写入。配置保存失败时保留旧配置；未知 YAML 字段会保留，注释和格式会重新生成。手动修改文件后，可用“重新读取配置”。
+
+### Windows 来源指针与完整恢复
+
+如果希望复用 Windows 方案，在窗口清空直接文件，按 [Windows 图文设置指南](https://alvinfunborn.github.io/DynCursor/guide.html) 操作。指南保留下面九张 README 历史截图，补充 Win10/11 入口、当前文件名、暂停/捕获、指针可见性、自启和排错。
+
+先保存原始 Windows 指针方案，再设置“帮助选择→箭头”、“候选→I 形”、“不可用→手形”，点“应用”后重新捕获。历史截图图案与新版原创素材不同，请按当前文件名选择。
+
+<details><summary>展开九张历史 Windows 设置截图</summary>
+
+![Windows 指针设置截图](resources/figure/before-a.jpg)
+![Windows 指针设置截图](resources/figure/search-a.jpg)
+![Windows 指针设置截图](resources/figure/after-a.jpg)
+![Windows 指针设置截图](resources/figure/before-i.jpg)
+![Windows 指针设置截图](resources/figure/search-i.jpg)
+![Windows 指针设置截图](resources/figure/after-i.jpg)
+![Windows 指针设置截图](resources/figure/before-h.jpg)
+![Windows 指针设置截图](resources/figure/search-h.jpg)
+![Windows 指针设置截图](resources/figure/after-h.jpg)
+
+</details>
+
+建议在 `鼠标属性 → 指针选项` 取消“在打字时隐藏指针”，可选开启“当按 CTRL 键时显示指针的位置”。窗口里的“Windows 指针设置”能快速到达系统指针选项卡。
+
+暂停和正常退出恢复本次捕获的目标光标。`--reset-cursors` 或窗口的“重载 Windows 已保存方案”重新加载当前保存方案，并非出厂设置；要彻底还原来源指针，请在 Windows 中选回事先保存的原始方案并应用。
 
 命令行选项：
 
@@ -48,11 +62,13 @@
 .\DynCursor.exe --version
 .\DynCursor.exe --check-config
 .\DynCursor.exe --check-config C:\path\to\config.yaml
+.\DynCursor.exe --show
+.\DynCursor.exe --background
 .\DynCursor.exe --stop
 .\DynCursor.exe --reset-cursors
 ```
 
-`--check-config` 仅校验配置并通过退出码报告结果（成功为 0），不会修改系统光标。输入法查询超时或前台窗口暂时不可用时，程序保留上一次光标状态，等待下次检测。
+`--check-config` 返回 0 表示有效，非 0 表示失败，不修改系统光标。输入法查询超时或前台窗口暂不可用时保留上一次状态。受保护窗口、第三方输入法或自行绘制指针的应用需要按实际环境验证。
 
 ## 从源码构建
 
@@ -62,16 +78,24 @@
 cargo test --locked
 cargo clippy --locked --all-targets -- -D warnings
 cargo build --locked --release
-Copy-Item config target/release -Recurse -Force
+Copy-Item config,resources target/release -Recurse -Force
+node --test scripts/test-settings.cjs
+./scripts/package.ps1
 ```
+
+设置 UI 为静态 HTML/CSS/JS，Tauri 直接嵌入，无需 npm 构建。重新生成图标或示例光标时需要 Node.js 与 `sharp`，执行 `node scripts/build-icons.cjs` / `node scripts/build-cursors.cjs`；更新依赖后执行 `python scripts/collect-licenses.py`。
 
 随后运行 `target/release/DynCursor.exe`。回归测试使用模拟光标，不修改桌面的系统指针。GitHub Actions 会执行检查并生成包含程序、配置及示例光标的便携 ZIP。
 
-当前版本为 `1.0.0`，源码版本、Windows 文件版本与 Git 标签保持一致。更新内容见 [CHANGELOG.md](CHANGELOG.md)。历史 `v0.2.1` 中的 `Cargo.toml` 曾保留 `0.1.0`，属于元数据未同步。
+当前版本为 `1.1.0`，源码版本、Windows 文件版本与 Git 标签保持一致。更新内容见 [CHANGELOG.md](CHANGELOG.md)。历史 `v0.2.1` 中的 `Cargo.toml` 曾保留 `0.1.0`，属于元数据未同步。
 
 ## 支持项目
 
 欢迎通过 Star、反馈问题和改进文档支持维护。收款入口正在准备中，暂未开放；后续会统一更新[赞助说明页](https://alvinfunborn.github.io/DynCursor/sponsor.html)。
+
+## 许可证
+
+源码及原创文档采用 [MIT License](LICENSE)。第三方组件、Windows 界面元素和历史下载的光标素材保留各自的权利与授权，详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) 及 [THIRD_PARTY_LICENSES.txt](THIRD_PARTY_LICENSES.txt)。新版 Logo、`resources/cursor-source/*.svg` 与三个 `custom-*.cur` 为原创，采用 MIT。其余历史 `.cur` 来源未逐一核实，不包含在本项目自有 MIT 授权中，也不进入新版便携发布包。
 
 ## 效果图
 - 使用个性化图标
@@ -79,6 +103,9 @@ Copy-Item config target/release -Recurse -Force
 ![avatar](resources/figure/finalcut1.gif)
 
 ## 如何设置开机自启动
+
+在窗口“启动与托盘”开启登录自启动；如果使用过下面的手动快捷方式，请删除重复项。
+
 [在 Windows 中更改哪些应用在启动时自动运行](https://support.microsoft.com/zh-cn/windows/%E5%9C%A8-windows-%E4%B8%AD%E6%9B%B4%E6%94%B9%E5%93%AA%E4%BA%9B%E5%BA%94%E7%94%A8%E5%9C%A8%E5%90%AF%E5%8A%A8%E6%97%B6%E8%87%AA%E5%8A%A8%E8%BF%90%E8%A1%8C-9115d841-735e-488d-e749-9ba301d441e6#ID0EBD=Windows_10)
 
 ## 附录

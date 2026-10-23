@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>DynCursor — 看一眼光标，就知道中英文</title>
-  <meta name="description" content="DynCursor 是 Windows 动态光标工具，根据输入法的中英文状态切换鼠标指针图案。本地运行，无需安装。下载 1.0.0 并查看配置指南。">
+  <meta name="description" content="DynCursor 是 Windows 动态光标工具，根据输入法的中英文状态切换鼠标指针图案。本地运行，无需安装。下载 1.1.0 并查看配置指南。">
   <meta name="theme-color" content="#f6f7f2">
   <meta property="og:title" content="DynCursor — 让输入状态，在光标上看得见">
   <meta property="og:description" content="一个小小的光标变化，少一次中英文猜测。Windows 动态光标工具。">
@@ -19,17 +19,17 @@
   <a class="skip-link" href="#main">跳到主要内容</a>
   <div class="page-shell">
     <header class="site-header">
-      <a class="brand" href="./" aria-label="DynCursor 首页"><span class="brand-icon" aria-hidden="true">↖</span>DynCursor<span class="brand-dot">.</span></a>
-      <nav aria-label="主导航"><a href="#how">效果</a><a href="#setup">开始使用</a><a href="#faq">常见问题</a><a href="sponsor.html">支持项目 <span aria-hidden="true">↗</span></a></nav>
+      <a class="brand" href="./" aria-label="DynCursor 首页"><img class="brand-icon" src="assets/logo.svg" width="32" height="32" alt="">DynCursor<span class="brand-dot">.</span></a>
+      <nav aria-label="主导航"><a href="#how">效果</a><a href="guide.html">设置指南</a><a href="#faq">常见问题</a><a href="sponsor.html">支持项目 <span aria-hidden="true">↗</span></a></nav>
     </header>
     <main id="main">
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <div class="eyebrow"><span class="status-dot" aria-hidden="true"></span> WINDOWS 小工具 <span class="version">v1.0.0</span></div>
+          <div class="eyebrow"><span class="status-dot" aria-hidden="true"></span> WINDOWS 小工具 <span class="version">v1.1.0</span></div>
           <h1 id="hero-title">看一眼光标，<br>就知道<span class="accent-word">中英文<svg viewBox="0 0 250 15" aria-hidden="true"><path d="M3 10 Q110 0 246 8"/></svg></span>。</h1>
           <p class="hero-description">让鼠标指针，跟着输入法变。<br>少看一次任务栏，少打一次错字。</p>
           <div class="hero-actions"><a class="button primary" href="https://github.com/alvinfunborn/DynCursor/releases/latest/download/DynCursor.zip"><span aria-hidden="true">↓</span> 下载 Windows 版</a><a class="text-link" href="https://github.com/alvinfunborn/DynCursor">查看源码 <span aria-hidden="true">↗</span></a></div>
-          <p class="download-meta">Windows x64 · 解压即用 · 首次需配置指针图案</p>
+          <p class="download-meta">Windows 10 / 11 x64 · 设置窗口与托盘 · 需要 WebView2</p>
         </div>
         <div class="demo" data-mode="en">
           <div class="demo-topline"><span><i aria-hidden="true"></i> INPUT STATE / 输入状态</span><span class="demo-counter">01 — 02</span></div>
@@ -41,20 +41,21 @@
           <p class="demo-note">交互示意 · 点击切换，体验状态变化 · 图案可自行配置</p>
         </div>
       </section>
-      <div class="facts-bar" aria-label="产品特点"><span><b>01</b> 输入状态，随光标可见</span><span><b>02</b> 箭头 / 文本 / 链接指针</span><span><b>03</b> 本地运行，无需账号</span></div>
+      <div class="facts-bar" aria-label="产品特点"><span><b>01</b> 输入状态，随光标可见</span><span><b>02</b> 设置窗口 / 托盘 / 自启动</span><span><b>03</b> 本地运行，无需账号</span></div>
       <section id="how" class="how-section section-space" aria-labelledby="how-title">
         <div><p class="section-kicker">A SMALL CHANGE, A CLEAR SIGNAL.</p><h2 id="how-title">不用猜现在<br>是哪种输入法。</h2><p class="section-description">微软拼音的中文、英文状态，有时只差一个 Shift。DynCursor 定期检测前台窗口的输入状态，把区别放到你正在看的光标上。</p><a class="text-link" href="#setup">了解如何配置 <span aria-hidden="true">↓</span></a></div>
         <div class="how-details"><div class="signal-pair"><div><span class="signal-label">ENGLISH</span><span class="pointer-sample" aria-hidden="true">↖</span><h3>默认状态</h3><p>使用启动时保存的指针图案。</p></div><div><span class="signal-label">中文输入</span><span class="pointer-sample chinese" aria-hidden="true">↖</span><h3>自定义状态</h3><p>使用你配置的替换指针图案。</p></div></div><details class="recording"><summary>查看项目实际效果录屏 <span class="pill">GIF</span><span aria-hidden="true">＋</span></summary><p>项目历史录屏，用于展示核心效果。展开播放，收起即可停止显示。</p><img src="assets/demo.gif" alt="Windows 上切换输入法后，鼠标指针跟随状态切换图案的实际演示" loading="lazy" width="457" height="561"></details></div>
       </section>
       <section id="setup" class="setup-section section-space" aria-labelledby="setup-title">
-        <div class="section-heading"><div><p class="section-kicker">READY WHEN YOU ARE.</p><h2 id="setup-title">三步，让状态看得见。</h2></div><a class="text-link" href="https://github.com/alvinfunborn/DynCursor#使用">完整图文指南 <span aria-hidden="true">↗</span></a></div>
-        <ol class="steps"><li><span class="step-number">01 /</span><h3>下载并完整解压</h3><p>下载 ZIP，保留程序旁的 <code>config</code> 和 <code>resources</code> 文件夹，无需安装。</p><a href="https://github.com/alvinfunborn/DynCursor/releases/latest/download/DynCursor.zip">下载 DynCursor.zip <span aria-hidden="true">↗</span></a></li><li><span class="step-number">02 /</span><h3>给指针配一组图案</h3><p>在 Windows「鼠标属性 → 指针」中修改帮助选择、候选、不可用图案。包内 <code>resources/cur</code> 提供示例。</p><a href="https://github.com/alvinfunborn/DynCursor#使用">查看配置截图 <span aria-hidden="true">↗</span></a></li><li><span class="step-number">03 /</span><h3>启动，切换，感受一下</h3><p>运行 <code>DynCursor.exe</code>，切换微软拼音中英文状态。默认改变箭头、文本和链接三类指针。</p><a href="https://github.com/alvinfunborn/DynCursor/blob/main/config/config.yaml">查看默认配置 <span aria-hidden="true">↗</span></a></li></ol>
-        <div class="command-strip"><div><strong>用完，恢复原来的样子。</strong><p>运行退出命令，程序会先恢复光标再关闭。</p></div><div class="command"><code>.\DynCursor.exe --stop</code><button type="button" data-command=".\DynCursor.exe --stop" aria-label="复制退出命令">复制</button></div></div><p id="copy-status" role="status" class="copy-status"></p>
+        <div class="section-heading"><div><p class="section-kicker">READY WHEN YOU ARE.</p><h2 id="setup-title">打开设置，让光标跟着你变。</h2></div><a class="text-link" href="guide.html">完整图文指南 <span aria-hidden="true">↗</span></a></div>
+        <ol class="steps"><li><span class="step-number">01 /</span><h3>下载并完整解压</h3><p>下载 ZIP，保留程序旁的 <code>config</code> 和 <code>resources</code> 文件夹，无需安装。</p><a href="https://github.com/alvinfunborn/DynCursor/releases/latest/download/DynCursor.zip">下载 DynCursor.zip <span aria-hidden="true">↗</span></a></li><li><span class="step-number">02 /</span><h3>在窗口里选择光标</h3><p>运行程序，进入「光标外观」。新版附带原创光标，可直接选择 .cur 文件，也可按指南使用 Windows 来源指针。</p><a href="guide.html#window">查看窗口配置步骤 <span aria-hidden="true">↗</span></a></li><li><span class="step-number">03 /</span><h3>启动，切换，感受一下</h3><p>切换微软拼音中英文状态验证。可在托盘暂停与恢复，在「启动与托盘」开启登录自启。</p><a href="https://github.com/alvinfunborn/DynCursor/blob/main/config/config.yaml">查看默认配置 <span aria-hidden="true">↗</span></a></li></ol>
+        <div class="setup-guide-link"><div><strong>窗口快捷配置，Windows 设置也讲清楚。</strong><p>指南包含设置窗口、文件选择、托盘、自启，以及沿用 README 九张截图的 Windows 指针设置与完整恢复步骤。</p></div><a class="button primary" href="guide.html">打开 Windows 图文指南 ↗</a></div>
+        <div class="command-strip"><div><strong>用完，恢复原来的样子。</strong><p>托盘右键选「恢复光标并退出」，也可使用命令。</p></div><div class="command"><code>.\DynCursor.exe --stop</code><button type="button" data-command=".\DynCursor.exe --stop" aria-label="复制退出命令">复制</button></div></div><p id="copy-status" role="status" class="copy-status"></p>
       </section>
-      <section id="faq" class="faq-section section-space" aria-labelledby="faq-title"><div><p class="section-kicker">GOOD TO KNOW.</p><h2 id="faq-title">开始前，<br>你可能想知道。</h2><p class="section-description">一个小工具，把一件事做好。</p></div><div class="faq-list"><details><summary>支持哪些输入法？<span aria-hidden="true">＋</span></summary><p>默认面向 Windows 上的微软拼音与简体中文（0804）。可以在配置文件中添加其他语言编码；第三方输入法能否正确报告状态，需要按实际环境验证。</p></details><details><summary>怎么退出？强制结束后怎么恢复？<span aria-hidden="true">＋</span></summary><p>运行 <code>DynCursor.exe --stop</code> 正常退出并恢复光标。如果进程被强制结束，确认已经退出后运行 <code>DynCursor.exe --reset-cursors</code>，或在 Windows 鼠标属性中重新应用指针方案。</p></details><details><summary>从 0.2.1 升级需要注意什么？<span aria-hidden="true">＋</span></summary><p>先在任务管理器中结束旧版进程，再运行新版。旧版不支持新的 <code>--stop</code> 命令。原 YAML 配置格式保持兼容，完整变化可查看<a href="https://github.com/alvinfunborn/DynCursor/blob/main/CHANGELOG.md">更新日志</a>。</p></details><details><summary>如何设置开机启动？<span aria-hidden="true">＋</span></summary><p>按 Win + R，输入 <code>shell:startup</code>，把 <code>DynCursor.exe</code> 的快捷方式放入打开的启动文件夹。程序与配置文件仍保留在原来的解压目录中。</p></details><details><summary>为什么切换后没有变化？<span aria-hidden="true">＋</span></summary><p>先检查来源指针是否已经设置为不同图案，并确认没有旧版进程同时运行。可用 <code>DynCursor.exe --check-config</code> 检查配置。修改配置或系统指针方案后，需要退出并重新启动程序。</p></details></div></section>
+      <section id="faq" class="faq-section section-space" aria-labelledby="faq-title"><div><p class="section-kicker">GOOD TO KNOW.</p><h2 id="faq-title">开始前，<br>你可能想知道。</h2><p class="section-description">一个小工具，把一件事做好。</p></div><div class="faq-list"><details><summary>支持哪些输入法？<span aria-hidden="true">＋</span></summary><p>默认面向 Windows 上的微软拼音与简体中文（0804）。可以在「输入与检测」中添加其他语言编码；第三方输入法能否正确报告状态，需要按实际环境验证。</p></details><details><summary>怎么退出？强制结束后怎么恢复？<span aria-hidden="true">＋</span></summary><p>托盘右键选「恢复光标并退出」，或运行 <code>DynCursor.exe --stop</code>。如果进程被强制结束，确认已经退出后运行 <code>DynCursor.exe --reset-cursors</code>，或在 Windows 鼠标属性中重新应用指针方案。</p></details><details><summary>从 0.2.1 升级需要注意什么？<span aria-hidden="true">＋</span></summary><p>先在任务管理器中结束旧版进程，再运行新版。旧版不支持新的 <code>--stop</code> 命令。原 YAML 配置格式保持兼容，完整变化可查看<a href="https://github.com/alvinfunborn/DynCursor/blob/main/CHANGELOG.md">更新日志</a>。</p></details><details><summary>如何设置开机启动？<span aria-hidden="true">＋</span></summary><p>在设置窗口「启动与托盘」开启「登录 Windows 后自动启动」，登录时直接驻留托盘。若旧版曾手动添加启动快捷方式，请先删除重复项。</p></details><details><summary>为什么切换后没有变化？<span aria-hidden="true">＋</span></summary><p>先检查是否已启用自动切换、选择了不同图案，且没有旧版同时运行。可用 <code>DynCursor.exe --check-config</code> 检查配置。窗口内修改后点「保存并应用」；Windows 方案修改后点「重新捕获并恢复运行」。</p></details></div></section>
       <section class="support-banner"><div><p class="section-kicker">SMALL TOOL. SHARED EFFORT.</p><h2>顺手的小工具，<br>一起慢慢打磨。</h2><p>一个 Star、一条反馈，都是继续维护的动力。</p></div><a class="button light" href="sponsor.html">支持 DynCursor <span aria-hidden="true">↗</span></a></section>
     </main>
-    <footer class="site-footer"><a class="brand" href="./">DynCursor<span class="brand-dot">.</span></a><p>让输入状态，在光标上看得见。</p><div><a href="https://github.com/alvinfunborn/DynCursor/releases/tag/v1.0.0">v1.0.0</a><a href="https://github.com/alvinfunborn/DynCursor/issues">反馈问题 ↗</a><a href="sponsor.html">赞助说明 ↗</a></div><small>© 2026 alvinfunborn</small></footer>
+    <footer class="site-footer"><a class="brand" href="./"><img class="brand-icon" src="assets/logo.svg" width="32" height="32" alt="">DynCursor<span class="brand-dot">.</span></a><p>让输入状态，在光标上看得见。</p><div><a href="https://github.com/alvinfunborn/DynCursor/releases/tag/v1.1.0">v1.1.0</a><a href="https://github.com/alvinfunborn/DynCursor/blob/main/LICENSE">MIT License</a><a href="https://github.com/alvinfunborn/DynCursor/issues">反馈问题 ↗</a><a href="sponsor.html">赞助说明 ↗</a></div><small>© 2026 alvinfunborn</small></footer>
   </div>
 </body>
 </html>

@@ -1,13 +1,23 @@
 # 需要替换光标的输入法编码, 可以配置多个, 使用英文逗号','分隔, 
-# 修改后需要重启
+# 手动修改后可在设置窗口“重新读取配置”
 # 例`0804`是PRC简体中文, `0409`是US英文, 输入法编码参考文档https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-lcid/70feba9f-294e-491e-b6eb-56532684c37f
 custom-layout: 0804
 
 # 光标替换映射, key:value格式, 可以配置多个, 使用英文逗号','分隔; 注意key是默认光标, value是替换光标;
-# 修改后需要重启
+# 手动修改后可在设置窗口“重新读取配置”
 # 例`32512:32651`是在自定义状态下用`帮助选择`图案显示`正常选择`；切回默认状态时恢复原图案，来源光标保持不变。
 # `32513:32516`和`32649:32648`同理。编码必须有效，目标不能重复；光标编码参考文档https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadcursorw
 cursor-mapping: 32512:32651, 32513:32516, 32649:32648
 
 # 是否启用日志记录, true表示启用, false表示禁用
 enable-logging: false
+
+# Settings window defaults; existing configurations remain compatible.
+enabled: true
+poll-interval-ms: 100
+stability-ms: 100
+start-minimized: false
+close-to-tray: true
+arrow-file: resources/cur/custom-arrow.cur
+text-file: resources/cur/custom-beam.cur
+link-file: resources/cur/custom-link.cur

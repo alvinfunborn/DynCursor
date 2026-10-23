@@ -7,11 +7,12 @@ const CURSOR_IDS: &[u32] = &[
     32651,
 ];
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Config {
     pub custom_layouts: BTreeSet<u16>,
     pub cursor_mapping: BTreeMap<u32, u32>,
     pub enable_logging: bool,
+    pub settings: crate::settings::Settings,
 }
 
 impl Config {
@@ -68,7 +69,60 @@ impl Config {
             custom_layouts,
             cursor_mapping,
             enable_logging,
+            settings: crate::settings::Settings::from_values(&values)?,
         })
+    }
+
+    pub fn from_settings(settings: crate::settings::Settings) -> Result<Self, String> {
+        let text = serde_yaml::to_string(&settings.values()).map_err(|e| e.to_string())?;
+        Self::parse(&text)
+    }
+
+    pub fn defaults() -> Self {
+        Self::parse(include_str!("../config/config.yaml")).expect("bundled configuration is valid")
+    }
+
+    pub fn validate_files(&self, directory: &Path) -> Result<(), String> {
+        for (_, path) in self.settings.cursor_files(directory) {
+            if !path
+                .extension()
+                .map(|s| s.eq_ignore_ascii_case("cur"))
+                .unwrap_or(false)
+            {
+                return Err(format!("请选择 .cur 静态光标文件：{}", path.display()));
+            }
+            let metadata = fs::metadata(&path)
+                .map_err(|e| format!("无法读取光标 {}：{}", path.display(), e))?;
+            if !metadata.is_file() || metadata.len() > 2 * 1024 * 1024 {
+                return Err(format!("光标必须是 2 MB 以内的文件：{}", path.display()));
+            }
+        }
+        Ok(())
+    }
+
+    pub fn save(&self, path: &Path) -> Result<(), String> {
+        let mut values: BTreeMap<String, String> = fs::read_to_string(path)
+            .ok()
+            .and_then(|text| serde_yaml::from_str(&text).ok())
+            .unwrap_or_default();
+        values.extend(self.settings.values());
+        let text = serde_yaml::to_string(&values).map_err(|e| e.to_string())?;
+        let parent = path.parent().ok_or("配置目录无效")?;
+        fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+        let temporary = parent.join(format!(
+            ".config-{}-{}.tmp",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map_err(|e| e.to_string())?
+                .as_nanos()
+        ));
+        fs::write(&temporary, text).map_err(|e| e.to_string())?;
+        if let Err(error) = fs::rename(&temporary, path) {
+            let _ = fs::remove_file(&temporary);
+            return Err(format!("无法保存配置 {}：{}", path.display(), error));
+        }
+        Ok(())
     }
 }
 
@@ -89,6 +143,44 @@ mod tests {
         assert_eq!(config.custom_layouts, BTreeSet::from([0x0804]));
         assert_eq!(config.cursor_mapping.get(&32512), Some(&32651));
         assert!(!config.enable_logging);
+    }
+
+    #[test]
+    fn saving_preserves_unknown_keys_and_failed_save_preserves_original() {
+        let directory = std::env::temp_dir().join(format!(
+            "DynCursor-config-test-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir(&directory).unwrap();
+        let path = directory.join("config.yaml");
+        fs::write(
+            &path,
+            "custom-layout: 0804\ncursor-mapping: 32512:32651\nuser-option: keep-me\n",
+        )
+        .unwrap();
+        let mut config = Config::load(&path).unwrap();
+        config.settings.start_minimized = true;
+        config.save(&path).unwrap();
+        assert!(Config::load(&path).unwrap().settings.start_minimized);
+        let values: BTreeMap<String, String> =
+            serde_yaml::from_str(&fs::read_to_string(&path).unwrap()).unwrap();
+        assert_eq!(values["user-option"], "keep-me");
+        let original = fs::read(&path).unwrap();
+        let lock = fs::OpenOptions::new().read(true).open(&path).unwrap();
+        // A directory in the destination position must fail without leaving temporary files.
+        let bad_target = directory.join("existing-directory");
+        fs::create_dir(&bad_target).unwrap();
+        assert!(config.save(&bad_target).is_err());
+        assert_eq!(fs::read(&path).unwrap(), original);
+        assert_eq!(fs::read_dir(&directory).unwrap().count(), 2);
+        drop(lock);
+        fs::remove_file(&path).unwrap();
+        fs::remove_dir(&bad_target).unwrap();
+        fs::remove_dir(&directory).unwrap();
     }
 
     #[test]

@@ -20,7 +20,10 @@ for (const button of document.querySelectorAll('[data-command]')) {
     const status = document.querySelector('#copy-status');
     try {
       await navigator.clipboard.writeText(button.dataset.command);
-      status.textContent = '退出命令已复制，请在程序目录运行。';
+      status.textContent = button.dataset.copyMessage || '退出命令已复制，请在程序目录运行。';
+      const originalText = button.textContent;
+      button.textContent = '已复制';
+      setTimeout(() => { button.textContent = originalText; }, 1800);
     } catch {
       status.textContent = '浏览器未允许复制，请手动选择并复制上方命令。';
     }

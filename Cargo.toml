@@ -1,11 +1,14 @@
 [package]
 name = "DynCursor"
-version = "1.0.0"
+version = "1.1.0"
 authors = ["zhouwenxiang <zhouwx@lanxi.com>"]
-edition = "2018"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/alvinfunborn/DynCursor"
+homepage = "https://alvinfunborn.github.io/DynCursor/"
 
 [build-dependencies]
-winres = "0.1"
+tauri-build = "2"
 
 [dependencies]
 # 基础组件
@@ -13,6 +16,17 @@ log = "0.4"
 log4rs = "1.4"
 log-panics = "2.0"
 serde_yaml = "0.8.21"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri = { version = "2", features = ["tray-icon", "image-ico"] }
+tauri-plugin-autostart = "2"
+tauri-plugin-dialog = "2"
+image = { version = "0.25", default-features = false, features = ["ico", "png"] }
+base64 = "0.23"
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]
 
 [dependencies.windows]
 version = "0.24"

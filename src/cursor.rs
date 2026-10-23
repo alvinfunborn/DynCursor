@@ -15,6 +15,7 @@ pub struct CursorManager<B: CursorBackend> {
     originals: BTreeMap<u32, B::Image>,
     dirty: BTreeSet<u32>,
     applied: Option<bool>,
+    replacements: BTreeMap<u32, B::Image>,
 }
 
 impl<B: CursorBackend> CursorManager<B> {
@@ -31,6 +32,7 @@ impl<B: CursorBackend> CursorManager<B> {
             originals,
             dirty: BTreeSet::new(),
             applied: Some(false),
+            replacements: BTreeMap::new(),
         })
     }
 
@@ -41,7 +43,13 @@ impl<B: CursorBackend> CursorManager<B> {
         self.applied = None;
         for (&target, &source) in &self.mapping {
             self.dirty.insert(target);
-            let image = &self.originals[&if custom { source } else { target }];
+            let image = if custom {
+                self.replacements
+                    .get(&target)
+                    .unwrap_or(&self.originals[&source])
+            } else {
+                &self.originals[&target]
+            };
             if let Err(error) = self.backend.apply(image, target) {
                 // Keep the operation retryable; never commit a partially applied state.
                 if let Err(restore_error) = self.restore() {
@@ -75,6 +83,11 @@ impl<B: CursorBackend> CursorManager<B> {
             None
         };
         first_error.map_or(Ok(()), Err)
+    }
+
+    pub fn with_replacements(mut self, replacements: BTreeMap<u32, B::Image>) -> Self {
+        self.replacements = replacements;
+        self
     }
 }
 
@@ -114,6 +127,20 @@ impl Drop for OwnedCursor {
 }
 
 pub struct WindowsBackend;
+
+impl WindowsBackend {
+    pub fn load_file(path: &std::path::Path) -> io::Result<OwnedCursor> {
+        use std::os::windows::ffi::OsStrExt;
+        let mut path: Vec<u16> = path.as_os_str().encode_wide().collect();
+        path.push(0);
+        let cursor = unsafe { LoadCursorFromFileW(PWSTR(path.as_mut_ptr())) };
+        if cursor.0 == 0 {
+            Err(io::Error::last_os_error())
+        } else {
+            Ok(OwnedCursor(cursor))
+        }
+    }
+}
 
 impl CursorBackend for WindowsBackend {
     type Image = OwnedCursor;
@@ -191,6 +218,19 @@ mod tests {
     }
 
     #[test]
+    fn original_bundled_cur_files_load_without_changing_system_cursors() {
+        for name in ["custom-arrow.cur", "custom-beam.cur", "custom-link.cur"] {
+            let cursor = WindowsBackend::load_file(
+                &std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+                    .join("resources/cur")
+                    .join(name),
+            )
+            .unwrap();
+            assert_ne!(cursor.0 .0, 0);
+        }
+    }
+
+    #[test]
     fn repeated_switches_restore_originals_and_preserve_overlapping_sources() {
         let (mut manager, state) = setup();
         for _ in 0..3 {
@@ -201,6 +241,20 @@ mod tests {
             manager.set_custom(true).unwrap();
             assert_eq!(state.borrow().writes.len(), count);
             manager.set_custom(false).unwrap();
+            assert_eq!(state.borrow().images[&1], 101);
+            assert_eq!(state.borrow().images[&2], 102);
+        }
+    }
+
+    #[test]
+    fn file_replacements_override_sources_and_still_restore_originals() {
+        let (manager, state) = setup();
+        let mut manager = manager.with_replacements(BTreeMap::from([(1, 999)]));
+        for _ in 0..3 {
+            manager.set_custom(true).unwrap();
+            assert_eq!(state.borrow().images[&1], 999);
+            assert_eq!(state.borrow().images[&2], 103);
+            manager.restore().unwrap();
             assert_eq!(state.borrow().images[&1], 101);
             assert_eq!(state.borrow().images[&2], 102);
         }

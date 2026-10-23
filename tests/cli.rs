@@ -21,6 +21,17 @@ impl Fixture {
     fn executable(&self) -> PathBuf {
         let executable = self.0.join("DynCursor.exe");
         fs::copy(env!("CARGO_BIN_EXE_DynCursor"), &executable).unwrap();
+        let cursors = self.0.join("resources/cur");
+        fs::create_dir_all(&cursors).unwrap();
+        for name in ["custom-arrow.cur", "custom-beam.cur", "custom-link.cur"] {
+            fs::copy(
+                Path::new(env!("CARGO_MANIFEST_DIR"))
+                    .join("resources/cur")
+                    .join(name),
+                cursors.join(name),
+            )
+            .unwrap();
+        }
         executable
     }
 }

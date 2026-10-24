@@ -1,6 +1,6 @@
 # DynCursor
 
-[项目主页](https://alvinfunborn.github.io/DynCursor/) · [Windows 图文设置指南](https://alvinfunborn.github.io/DynCursor/guide.html) · [下载 v1.1.1](https://github.com/alvinfunborn/DynCursor/releases/latest) · [赞助说明](https://alvinfunborn.github.io/DynCursor/sponsor.html)
+[项目主页](https://alvinfunborn.github.io/DynCursor/) · [作者与更多项目](https://alvinfunborn.github.io/) · [Windows 图文设置指南](https://alvinfunborn.github.io/DynCursor/guide.html) · [下载 v1.1.1](https://github.com/alvinfunborn/DynCursor/releases/latest) · [赞助说明](https://alvinfunborn.github.io/DynCursor/sponsor.html)
 1.1.0 提供设置窗口、托盘菜单、登录自启动和直接选择光标文件，默认附带三枚原创光标。下方保留 Windows 来源映射的原理与手动配置说明。
 
 ## Windows系统动态修改鼠标指针光标图标样式, 根据键盘布局/语言/输入法的切换而变化.

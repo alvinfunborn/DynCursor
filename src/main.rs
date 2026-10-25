@@ -8,13 +8,14 @@ mod engine;
 mod gui;
 mod ime;
 mod instance;
+mod launch;
 mod settings;
 mod yaml_client;
 
 fn run(arguments: &[std::ffi::OsString]) -> Result<(), String> {
     let executable = std::env::current_exe().map_err(|error| error.to_string())?;
     let config_path = yaml_client::config_path_for_executable(&executable)?;
-    let mut background = false;
+    let mut launch_mode = launch::LaunchMode::Normal;
     let mut safe_mode = false;
     let mut smoke_test = false;
     match arguments.first().and_then(|value| value.to_str()) {
@@ -51,17 +52,17 @@ fn run(arguments: &[std::ffi::OsString]) -> Result<(), String> {
             return Err(format!("重置光标失败：{}", std::io::Error::last_os_error()));
         }
         Some("--show") if arguments.len() == 1 => {
-            if instance::request_show()? {
-                return Ok(());
-            }
+            launch_mode = launch::LaunchMode::Show;
         }
-        Some("--background") if arguments.len() == 1 => background = true,
+        Some("--background") if arguments.len() == 1 => {
+            launch_mode = launch::LaunchMode::Background
+        }
         Some("--safe-mode") if arguments.len() == 1 => safe_mode = true,
         Some("--smoke-test") if arguments.len() == 1 => smoke_test = true,
         None if arguments.is_empty() => {}
         _ => return Err("未知参数，请使用 --help 查看用法".into()),
     }
-    gui::run(config_path, background, safe_mode, smoke_test)
+    gui::run(config_path, launch_mode, safe_mode, smoke_test)
 }
 
 fn main() {

@@ -1,6 +1,7 @@
 use crate::{
     engine::{Engine, Status},
     instance::Instance,
+    launch::LaunchMode,
     settings::Settings,
     yaml_client::Config,
 };
@@ -325,23 +326,18 @@ fn smoke_ready(app: AppHandle, state: tauri::State<'_, AppState>) -> Result<(), 
 
 pub fn run(
     config_path: PathBuf,
-    background: bool,
+    launch_mode: LaunchMode,
     safe_mode: bool,
     smoke_test: bool,
 ) -> Result<(), String> {
-    let instance = match if smoke_test {
+    let instance = if smoke_test {
         Instance::acquire_smoke_test()
     } else {
-        Instance::acquire()
-    } {
-        Ok(instance) => instance,
-        Err(error) => {
-            if crate::instance::request_show()? {
-                return Ok(());
-            }
-            return Err(error);
+        match Instance::acquire_for_launch(launch_mode)? {
+            Some(instance) => Ok(instance),
+            None => return Ok(()),
         }
-    };
+    }?;
     let directory = std::env::current_exe()
         .map_err(|e| e.to_string())?
         .parent()
@@ -361,8 +357,8 @@ pub fn run(
     if let Err(error) = configure_logging(config.enable_logging, &directory) {
         initial_error = Some(error);
     }
-    let initial_hidden =
-        smoke_test || (initial_error.is_none() && (background || config.settings.start_minimized));
+    let initial_hidden = smoke_test
+        || launch_mode.initially_hidden(config.settings.start_minimized, initial_error.is_some());
     let app = tauri::Builder::default()
         .plugin(
             tauri_plugin_autostart::Builder::new()

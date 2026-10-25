@@ -1,6 +1,6 @@
 # DynCursor
 
-[项目主页](https://alvinfunborn.github.io/DynCursor/) · [作者与更多项目](https://alvinfunborn.github.io/) · [Windows 图文设置指南](https://alvinfunborn.github.io/DynCursor/guide.html) · [下载 v1.1.1](https://github.com/alvinfunborn/DynCursor/releases/latest) · [赞助说明](https://alvinfunborn.github.io/DynCursor/sponsor.html)
+[项目主页](https://alvinfunborn.github.io/DynCursor/) · [作者与更多项目](https://alvinfunborn.github.io/) · [Windows 图文设置指南](https://alvinfunborn.github.io/DynCursor/guide.html) · [下载 v1.1.2](https://github.com/alvinfunborn/DynCursor/releases/latest) · [赞助说明](https://alvinfunborn.github.io/DynCursor/sponsor.html)
 1.1.0 提供设置窗口、托盘菜单、登录自启动和直接选择光标文件，默认附带三枚原创光标。下方保留 Windows 来源映射的原理与手动配置说明。
 
 ## Windows系统动态修改鼠标指针光标图标样式, 根据键盘布局/语言/输入法的切换而变化.
@@ -87,7 +87,7 @@ node --test scripts/test-settings.cjs
 
 随后运行 `target/release/DynCursor.exe`。回归测试使用模拟光标，不修改桌面的系统指针。GitHub Actions 会执行检查并生成包含程序、配置及示例光标的便携 ZIP。
 
-当前版本为 `1.1.1`，源码版本、Windows 文件版本与 Git 标签保持一致。更新内容见 [CHANGELOG.md](CHANGELOG.md)。历史 `v0.2.1` 中的 `Cargo.toml` 曾保留 `0.1.0`，属于元数据未同步。
+当前版本为 `1.1.2`，源码版本、Windows 文件版本与 Git 标签保持一致。更新内容见 [CHANGELOG.md](CHANGELOG.md)。历史 `v0.2.1` 中的 `Cargo.toml` 曾保留 `0.1.0`，属于元数据未同步。
 
 ## 支持项目
 
@@ -104,7 +104,15 @@ node --test scripts/test-settings.cjs
 
 ## 如何设置开机自启动
 
-在窗口“启动与托盘”开启登录自启动；如果使用过下面的手动快捷方式，请删除重复项。
+在窗口“启动与托盘”开启登录自启动，登录时直接进入托盘。这个开关立即生效；“打开程序时，不弹设置窗口”需点“保存并应用”后生效。手动再次双击正在运行的程序仍会打开设置。
+
+如果旧版曾把快捷方式放进 `shell:startup`，建议移除该重复入口，仅保留窗口内的登录自启动。需要继续使用手动快捷方式时，在快捷方式“目标”的程序路径后加 ` --background`（加在引号外），例如：
+
+```text
+"D:\apps\DynCursor\DynCursor.exe" --background
+```
+
+开机仍弹窗口时，先检查是否同时存在注册表自启动和旧快捷方式。无参数的重复启动会被视为手动打开设置；`--background` 的重复启动则会静默退出。
 
 [在 Windows 中更改哪些应用在启动时自动运行](https://support.microsoft.com/zh-cn/windows/%E5%9C%A8-windows-%E4%B8%AD%E6%9B%B4%E6%94%B9%E5%93%AA%E4%BA%9B%E5%BA%94%E7%94%A8%E5%9C%A8%E5%90%AF%E5%8A%A8%E6%97%B6%E8%87%AA%E5%8A%A8%E8%BF%90%E8%A1%8C-9115d841-735e-488d-e749-9ba301d441e6#ID0EBD=Windows_10)
 
